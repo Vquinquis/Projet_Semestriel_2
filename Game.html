@@ -1,0 +1,4550 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Red Crossig Hood</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <script type="text/javascript">
+        var enemies
+        class Overworld extends Phaser.Scene {
+            constructor() {
+                super("Overworld");
+            }
+
+            preload() {
+                this.load.spritesheet('perso','assets/Red_Move.png',
+                    {frameWidth:32, frameHeight:64 });
+                this.load.spritesheet('perso_att','assets/Red_Attack_2.png',
+                    {frameWidth:96, frameHeight:86 });
+                this.load.spritesheet('perso_marche','assets/Red_Walk.png',
+                    {frameWidth:34, frameHeight:64 });
+                this.load.spritesheet('perso_saut','assets/Red_Jump_2.png',
+                    {frameWidth:32, frameHeight:70 });
+                this.load.spritesheet('perso_attd','assets/Red_AttackDown.png',
+                    {frameWidth:33, frameHeight:124 });
+                this.load.spritesheet('perso','assets/Red_Move.png',
+                    {frameWidth:32, frameHeight:64 });
+                this.load.spritesheet('vine','assets/vine.png',
+                    {frameWidth:32, frameHeight:320 });
+                this.load.image('finHar','assets/fin_haricot.png')
+                this.load.image('bout','assets/bout_vine.png')
+
+
+                this.load.spritesheet('ours','assets/Ours.png',
+                    {frameWidth:64, frameHeight:32 });
+                this.load.spritesheet('nain','assets/Nain.png',
+                    {frameWidth:32, frameHeight:32 });
+                this.load.spritesheet('geant','assets/Geant.png',
+                    {frameWidth:128, frameHeight:128 });
+
+                this.load.image('jack','assets/Jack.png')
+                this.load.image('textbox','assets/Box.png')
+                this.load.spritesheet('check','assets/Checkpoint.png',
+                    {frameWidth:32, frameHeight:32 })
+                this.load.image('UI','assets/UI.png')
+                this.load.image('UI2','assets/UI2.png')
+                this.load.spritesheet('coeur','assets/coeur.png',
+                    {frameWidth:128, frameHeight:32 })
+                this.load.spritesheet('vie','assets/Life.png',
+                    {frameWidth:96, frameHeight:25 })
+                this.load.image('epee','assets/sword.png')
+                this.load.image('Equipgrappin','assets/grappin.png')
+                this.load.image('haricUI','assets/haricot.png')
+                
+
+                this.load.spritesheet('grappin','assets/grap.png',
+                    {frameWidth:32, frameHeight:32})
+                this.load.image('soin','assets/panier.png')
+
+
+                this.load.image("Phaser_tuilesdejeu", "assets/Niveau/Placeholder_Tileset.png");
+                this.load.image("Fond","assets/Niveau/Niveau_Foret_Fond.png")
+                this.load.image("Propre","assets/Niveau/Niveau_Foret5.png")
+                // chargement de la carte
+                this.load.tilemapTiledJSON("carte", "assets/Niveau/Niveau_Foret.json"); 
+
+            }
+
+
+
+            create() {
+
+
+                enemies =this.physics.add.group({
+                    setCollideWorldBounds : true,
+                    origin:0,
+                    type:"Toto"
+                })
+
+                meuble= this.physics.add.group({
+                    immovable:true,
+                    allowGravity : false,
+                })
+
+                haricot= this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true,
+                    la:false
+                    
+                })
+
+                finHaricot= this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true,
+                })
+
+                bout=this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true,
+                })
+
+                prise=this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true
+                })
+                checkpoint=this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true
+                })
+                vide= this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true
+                })
+
+                cursors = this.input.keyboard.createCursorKeys();
+
+
+                const carteDuNiveau = this.add.tilemap("carte");
+
+                // chargement du jeu de tuiles
+                const tileset = carteDuNiveau.addTilesetImage(
+                        "Placeholder_Tileset",
+                        "Phaser_tuilesdejeu"
+                        );  ;
+
+                this.add.image(2080, 1600, 'Fond');
+                
+
+                // chargement du calque calque_background
+                const calque_background = carteDuNiveau.createLayer(
+                        "Background",
+                        tileset
+                        );
+
+                // chargement du calque calque_background_2
+                const calque_background_2 = carteDuNiveau.createLayer(
+                        "Back_feuille",
+                        tileset
+                        );
+
+                // chargement du calque calque_plateformes
+                const calque_plateformes = carteDuNiveau.createLayer(
+                        "NIveau",
+                        tileset
+                        );
+                
+                this.add.image(2083, 1594, 'Propre');
+
+                calque_plateformes.setCollisionByProperty({ estSolide: true }); 
+
+                var har1=haricot.create(1392,2544-144,'vine')
+                var har2=haricot.create(1808,2544-144,'vine')
+                var har3=haricot.create(3408,2736-144,'vine')
+                var har4=haricot.create(688,1648-144,'vine')
+                var har5=haricot.create(1680,1392-144,'vine')
+                var har6=haricot.create(1616,2032-144,'vine')
+                var har7=haricot.create(1424,1360-144,'vine')
+
+                var finHar1=finHaricot.create(1392,2544-320,'finHar')
+                var finHar2=finHaricot.create(1808,2544-320,'finHar')
+                var finHar3=finHaricot.create(3408,2736-320,'finHar')
+                var finHar4=finHaricot.create(688,1648-320,'finHar')
+                var finHar5=finHaricot.create(1680,1392-320,'finHar')
+                var finHar6=finHaricot.create(1616,2032-320,'finHar')
+                var finHar7=finHaricot.create(1424,1360-320,'finHar')
+                finHaricot.setVisible(false)
+
+                var boutHar1=bout.create(1392,2544-288,'bout')
+                var boutHar2=bout.create(1808,2544-288,'bout')
+                var boutHar3=bout.create(3408,2736-288,'bout')
+                var boutHar4=bout.create(688,1648-288,'bout')
+                var boutHar5=bout.create(1680,1392-288,'bout')
+                var boutHar6=bout.create(1616,2032-288,'bout')
+                var boutHar6=bout.create(1424,1360-288,'bout')
+                bout.setVisible(false)
+                bout.getChildren().forEach(b => {
+                    b.setSize(30,32)
+                })
+
+                grappin= this.physics.add.sprite(40,100,'grappin')
+                grappin.setVisible(false)
+                grappin.body.setAllowGravity(false)
+
+                var check1=checkpoint.create(1280,2816,'check')
+                var check2=checkpoint.create(3264,2464,'check')
+                var check3=checkpoint.create(1440,1632,'check')
+                var check4=checkpoint.create(1824,1120,'check')
+
+                soin=this.physics.add.sprite(2000,1830,'soin')
+                
+                player = this.physics.add.sprite(posx, posy, 'perso');
+                player.setCollideWorldBounds(true);
+
+                var trou1=vide.create(1696,3168,'bout')
+                trou1.setSize(704,32)
+                var trou2=vide.create(2864,1696,'bout')
+                trou2.setSize(2260,32)
+                var trou3=vide.create(704,1792,'bout')
+                trou3.setSize(1408,32)
+
+                vide.setVisible(false)
+                
+
+                var enemi1=enemies.create(432,2448,'ours')
+                enemi1.type="ours"
+                var enemi2=enemies.create(752,2928,'nain')
+                enemi2.type="nain"
+                var enemi3=enemies.create(624,3152,'nain')
+                enemi3.type="nain"
+                var enemi4=enemies.create(816,3152,'nain')
+                enemi4.type="nain"
+                var enemi5=enemies.create(1584,2992,'nain')
+                enemi5.type="nain"
+                var enemi6=enemies.create(2576,2544,'ours')
+                enemi6.type="ours"
+                enemies.getChildren().forEach(enemy => {
+                    enemy.origin=enemy.x
+                })
+
+                pnj=this.physics.add.sprite(3664,2700,'jack')
+                pnj.body.immovable=true
+                
+                boss=this.physics.add.sprite(3568,2700,'geant')
+
+                ui=this.physics.add.sprite(250,110,'UI').setScrollFactor(0);//345
+                ui.setScale(.7)
+                ui.body.setAllowGravity(false)
+                ui2=this.physics.add.sprite(380,110,'UI2').setScrollFactor(0)
+                ui2.setScale(.7)
+                ui2.body.setAllowGravity(false)
+                afficheEpee=this.physics.add.sprite(380,110,'epee').setScrollFactor(0)
+                afficheEpee.body.setAllowGravity(false)
+                afficheEpee.setVisible(false)
+                afficheGrappin=this.physics.add.sprite(380,110,'Equipgrappin').setScrollFactor(0)
+                afficheGrappin.body.setAllowGravity(false)
+                afficheGrappin.setScale(.7)
+                afficheGrappin.setVisible(false)
+                afficheVie=this.physics.add.sprite(220,110,'coeur').setScrollFactor(0);
+                afficheVie.body.setAllowGravity(false)
+                afficheVie2=this.physics.add.sprite(315,100,'vie').setScrollFactor(0);
+                afficheVie2.body.setAllowGravity(false)
+                afficheVie2.setScale(.6)
+                objet1=this.physics.add.sprite(300,120,'haricUI').setScrollFactor(0);
+                objet1.body.setAllowGravity(false)
+                objet1.setScale(.7)
+                objet1.setVisible(false)
+                objet2=this.physics.add.sprite(330,117,'Equipgrappin').setScrollFactor(0);
+                objet2.body.setAllowGravity(false)
+                objet2.setScale(.6)
+                objet2.setVisible(false)
+
+                textbox=this.physics.add.sprite(3664,2608,'textbox')
+                text=this.add.text(275, 85, 'Merci de m avoir sauvé.\nPour te remercier je te donne ces\nharicots magiques.\nUtilise les avec "Maj"', { fontSize: '16px',fill:'#fff' }).setScrollFactor(0);
+                textbox.setVisible(false)
+                textbox.body.setAllowGravity(false)
+                text.setVisible(false)
+
+                this.physics.add.collider(player, calque_plateformes);
+                this.physics.add.collider(soin, calque_plateformes);
+                this.physics.add.collider(enemies,calque_plateformes);
+                this.physics.add.collider(boss,calque_plateformes);
+                this.physics.add.collider(pnj,calque_plateformes);
+                this.physics.add.collider(player,finHaricot)
+                this.physics.add.collider(player,bout)
+                this.physics.add.collider(grappin,prise,this.grapple)
+                this.physics.add.collider(player, enemies, this.hitEnemy);
+                this.physics.add.collider(player,boss, this.hitEnemy)
+                this.physics.add.collider(player,pnj,this.AfficheText)
+                this.physics.add.collider(player,vide,this.mort)
+
+
+                this.physics.add.overlap(player, enemies,this.attack)
+                this.physics.add.overlap(player, boss, this.hitBoss)
+                this.physics.add.overlap(player,haricot,this.haricot)
+                this.physics.add.overlap(player,checkpoint,this.check)
+                this.physics.add.overlap(player,soin,this.heal)
+                
+
+
+                // redimentionnement du monde avec les dimensions calculées via tiled
+                this.physics.world.setBounds(0, 0, 4160, 3200);
+                //  ajout du champs de la caméra de taille identique à celle du monde
+                this.cameras.main.setBounds(0, 0, 4160, 3200);
+                // ancrage de la caméra sur le joueur
+                this.cameras.main.startFollow(player);
+                this.cameras.main.setZoom(1.5);
+                
+
+                ctrl= this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL);
+
+
+                //Animations
+                this.anims.create({
+                    key: 'left',
+                    frames: this.anims.generateFrameNumbers('perso_marche', { start: 4, end: 7 }),
+                    frameRate: 10,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'turnD',
+                    frames: this.anims.generateFrameNumbers('perso', { start: 0, end: 3 }),
+                    frameRate: 4,
+                    repeat:-1
+                });
+                this.anims.create({
+                    key: 'turnG',
+                    frames: this.anims.generateFrameNumbers('perso', { start: 15, end: 12 }),
+                    frameRate: 4,
+                    repeat:-1
+                });
+                this.anims.create({
+                    key: 'right',
+                    frames: this.anims.generateFrameNumbers('perso_marche', { start: 0, end: 3 }),
+                    frameRate: 10,
+                    repeat: -1
+                    
+                });
+                this.anims.create({
+                    key: 'upD',
+                    frames: this.anims.generateFrameNumbers('perso_saut', { start: 1, end: 5 }),
+                    frameRate: 6,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'upG',
+                    frames: this.anims.generateFrameNumbers('perso_saut', { start: 13, end: 8 }),
+                    frameRate: 6,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'climbG',
+                    frames: this.anims.generateFrameNumbers('perso', { start: 11, end: 8 }),
+                    frameRate: 6,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'climbD',
+                    frames: this.anims.generateFrameNumbers('perso', { start: 4, end: 7 }),
+                    frameRate: 6,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'accroG',
+                    frames: [{ key: 'perso', frame :11}],
+                    frameRate: 5,
+                });
+                this.anims.create({
+                    key: 'accroD',
+                    frames: [{ key: 'perso', frame :4}],
+                    frameRate: 5,
+                })
+                this.anims.create({
+                    key: 'att1G',
+                    frames: this.anims.generateFrameNumbers('perso_att', { start: 11, end: 9 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'att1D',
+                    frames: this.anims.generateFrameNumbers('perso_att', { start: 0, end: 2 }),
+                    frameRate: 5,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'att2G',
+                    frames: this.anims.generateFrameNumbers('perso_att', { start: 8, end: 6 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'att2D',
+                    frames: this.anims.generateFrameNumbers('perso_att', { start: 3, end: 5 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'piqueG',
+                    frames: [{ key: 'perso_attd', frame :1}],
+                    frameRate: 5,
+
+                });
+                this.anims.create({
+                    key: 'piqueD',
+                    frames: [{ key: 'perso_attd', frame :0}],
+                    frameRate: 5,
+
+                });
+                this.anims.create({
+                    key: 'plante',
+                    frames: this.anims.generateFrameNumbers('vine', { start: 0, end: 10}),
+                    frameRate: 12,
+                    repeat: 0
+
+                });
+                this.anims.create({
+                    key: 'livre',
+                    frames: this.anims.generateFrameNumbers('check', { start: 0, end: 3}),
+                    frameRate: 5,
+                    repeat: -1
+
+                });
+                this.anims.create({
+                    key: 'oursG',
+                    frames: this.anims.generateFrameNumbers('ours', { start: 0, end: 1 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+
+                this.anims.create({
+                    key: 'oursD',
+                    frames: this.anims.generateFrameNumbers('ours', { start: 2, end: 3 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'nainG',
+                    frames: this.anims.generateFrameNumbers('nain', { start: 0, end: 3 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'nainD',
+                    frames: this.anims.generateFrameNumbers('nain', { start: 4, end: 7 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'geantG',
+                    frames: this.anims.generateFrameNumbers('geant', { start: 0, end: 3}),
+                    frameRate: 11,
+                    repeat: -1
+                });
+            }
+
+
+
+            update() {
+                
+                console.log(player.x)
+                console.log(player.y)
+                console.log(equipe)
+                console.log(posx)
+                console.log(posy)
+
+                this.majLife()
+
+                if (cursors.space.isDown&& texteDit==true){
+                    text.setVisible(false)
+                    textbox.setVisible(false)
+                    texteDit=false
+                }
+
+                checkpoint.getChildren().forEach(check => {
+                    check.anims.play('livre',true)
+                })
+
+                if (vie==0){
+                    this.mort(player)
+                }
+
+                
+                // IA Ennemis
+
+                enemies.getChildren().forEach(enemy => {
+                if (enemy.type=="ours" || enemy.type=="nain" || enemy.type=="bird" ||enemy.type=="epice"){
+                    if (enemy.x<=enemy.origin){
+                        enemy.anims.play(enemy.type+'D', true);
+                        enemy.setVelocityX(150)
+                    }
+                    else if (enemy.x>enemy.origin+192){
+                        enemy.anims.play(enemy.type+'G', true);
+                        enemy.setVelocityX(-150)
+                    }
+                }
+                if (enemy.type=="frog" && enemy.body.blocked.down){
+                    setTimeout(() => {
+                        enemy.setVelocityY(-500)
+                    if (enemy.x<=enemy.origin+100){
+                        enemy.setVelocityX(100)
+                    }
+                    else if (enemy.x>enemy.origin+199){
+                        enemy.setVelocityX(-100)
+                }
+                    },1000); }
+                    })
+
+                    if (player.x>3328 && player.y>2560){
+                        boss.setVelocityX(-50)
+                        boss.anims.play('geantG',true)
+                    }
+                
+
+                // UI
+                if (ctrl.isDown&& grappin_possede==true){
+                    ctrl.reset()
+                    if (equipe=="epee"){
+                        equipe="grappin"
+                    }
+                    else if (equipe=="grappin"){
+                        equipe="epee"  
+                    }
+                }
+
+                if (equipe=="epee"){
+                        afficheEpee.setVisible(true)
+                        afficheGrappin.setVisible(false)
+                    }
+                    else if (equipe=="grappin"){
+                        afficheEpee.setVisible(false)
+                        afficheGrappin.setVisible(true)
+                    }
+                if (haricot_possede==true){
+                    objet1.setVisible(true)
+                }
+                if (grappin_possede==true){
+                    objet2.setVisible(true)
+                }
+
+                //Grappin
+                if (grappinActive==false && grappinActiveHaut==false){
+                    grappin.x=player.x
+                    grappin.y=player.y
+                }
+
+                if(cursors.space.isDown && equipe=="grappin" && saut==false && cursors.up.isDown&& texteDit==false){
+                    grappinActiveHaut=true
+                    grappin.setVisible(true)
+                    grappin.setVelocityY(-350)
+                    cursors.right.reset();
+                    cursors.left.reset();
+                    cursors.up.reset();
+                    cursors.down.reset();
+                    cursors.space.reset();
+                    ctrl.reset()
+                    this.input.keyboard.enabled = false;
+                }
+
+                if(cursors.space.isDown && equipe=="grappin" && saut==false){
+                    grappinActive=true
+                    grappin.setVisible(true)
+                    if (sens=='droite'){
+                        grappin.setVelocityX(350)
+                        cursors.right.reset();
+                        cursors.left.reset();
+                        cursors.up.reset();
+                        cursors.down.reset();
+                        cursors.space.reset();
+                        ctrl.reset()
+                        this.input.keyboard.enabled = false;
+                        
+                    }
+                    else if (sens=='gauche'){
+                        grappin.setVelocityX(-350)
+                        cursors.right.reset();
+                        cursors.left.reset();
+                        cursors.up.reset();
+                        cursors.down.reset();
+                        cursors.space.reset();
+                        ctrl.reset()
+                        this.input.keyboard.enabled = false;
+                        
+                    }}
+
+                if (grappin.x-player.x>=384 || player.x-grappin.x>=384 || grappAccroch==true || player.y-grappin.y>=160){
+                    grappin.setVelocityX(0)
+                    grappin.setVelocityY(0)
+                    grappinActiveHaut=false
+                    grappinActive=false
+                    grappin.setVisible(false)
+                    this.input.keyboard.enabled = true;
+                }
+                
+                //Haricot
+
+                haricot.getChildren().forEach(haric => {
+                if (haric.la==true) {
+                    this.physics.add.collider(player,haric,this.accroche)
+                }})
+
+                finHaricot.getChildren().forEach(finHaric => {
+                    if (accroche==true){
+                        finHaric.setSize(96,32)
+                    }})
+
+                //if (accroche==false){
+                    //player.setSize(32,64)
+                    //player.setOffset(32,64)
+                //}
+
+                if(accroche==true){
+                    
+                    truc=true
+                    player.body.setAllowGravity(false)
+                    
+                    
+                    if (cursors.space.isDown){
+                        player.body.setAllowGravity(true)
+                        player.setVelocityY(-425)
+                        if (sens=="gauche"){
+                            player.anims.play("upD",true)
+                        }
+                        if (sens=="droite"){
+                            player.anims.play("upG",true)
+                        }
+                        saut=true
+
+                        finHaricot.getChildren().forEach(finHaric => {
+                    if(saut==true ){
+                        finHaric.setOffset(-5000,0)
+                    }
+                })
+
+                        accroche=false
+                        setTimeout(() => {
+                        truc=false
+                    },300);  
+
+                    }
+                    if (cursors.down.isDown) {
+                    if (sens=="gauche"){
+                            player.anims.play("climbG",true)
+                    }
+                    if (sens=="droite"){
+                        player.anims.play("climbD",true)
+                    }
+                    player.setVelocityY(250);
+                    }
+
+                    else if(cursors.left.isDown && sens=='gauche'){
+                        player.x=player.x-64
+                        sens='droite'
+                    }
+
+                    else if(cursors.right.isDown && sens=='droite'){
+                        player.x=player.x+64
+                        sens='gauche'
+                    }
+
+                    else if (cursors.up.isDown) {
+                        if (sens=="gauche"){
+                            player.anims.play("climbG",true)
+                    }
+                    if (sens=="droite"){
+                        player.anims.play("climbD",true)
+                    } 
+                        player.setVelocityY(-250);
+                    }
+
+                    else if (accroche==true){
+                        player.setVelocityY(0);
+                        if (sens=="gauche" ){
+                        player.anims.play("accroG",true)
+                    }
+                    if (sens=="droite"){
+                        player.anims.play("accroD",true)
+                    }
+                                    }
+                                }
+
+                if(cursors.shift.isDown && haricot_possede==true){
+                    plante=true
+                    setTimeout(() => {
+                        plante=false
+                    },300); }
+                
+
+                //Deplacement
+
+                if (cursors.left.isDown && accroche==false && texteDit==false) { //si la touche gauche est appuyée
+                    if (saut==false){
+                    player.anims.play('left', true);}
+                    sens= 'gauche'
+                    if (saut==false){
+                    player.setVelocityX(-250); //alors vitesse négative en X
+                    }
+                    if (saut==true){
+                    player.setVelocityX(-200); //alors vitesse négative en X
+                    }
+                    
+                }
+                else if (cursors.right.isDown && accroche==false&& texteDit==false) { //sinon si la touche droite est appuyée
+                    if (saut==false){
+                    player.anims.play('right', true);}
+                    sens= 'droite'
+                    if (saut==false){
+                    player.setVelocityX(250); //alors vitesse négative en X
+                    }
+                    if (saut==true){
+                    player.setVelocityX(200); //alors vitesse négative en X
+                    }
+                }
+
+                else { // sinon
+                    if (saut==false&&attack==false&&accroche==false){
+                    player.setVelocityX(0); //vitesse nulle
+                    if(sens=="gauche"){
+                    player.anims.play('turnG', true)
+                    };
+                    if(sens=="droite"){
+                    player.anims.play('turnD', true)
+                    }}
+                }
+
+                if (cursors.up.isDown && player.body.blocked.down && saut==false && equipe=="epee"&& texteDit==false) {
+                    saut = true
+                    player.setVelocityY(-425);
+                    if(sens=="gauche"){
+                    player.anims.play('upG', true)
+                    };
+                    if(sens=="droite"){
+                    player.anims.play('upD', true)
+                    }
+                }
+                
+                else if  (player.body.blocked.down){
+                    saut=false
+                }
+
+                if(saut==true){
+                    player.setOffset(0,6)
+                }
+                else if(saut==false){
+                    player.setOffset(0,0)
+                }
+
+                //Attaque 
+
+                if (cursors.space.isDown && sens=='droite' && saut == false && accroche==false && truc==false && equipe=="epee" && player.body.blocked.down){
+                    if (deja_att%2==0){
+                        player.anims.play('att1D', true)
+                    }
+                    else if(deja_att%2!=0){
+                        player.anims.play('att2D',true)
+                    }
+                    player.setVelocityX(20)
+                    player.setSize(80,75)
+                    player.setOffset(16,0)
+                    attack=true
+                    actd=true
+                    cursors.right.reset();
+                    cursors.left.reset();
+                    cursors.up.reset();
+                    cursors.down.reset();
+                    cursors.space.reset();
+                    this.input.keyboard.enabled = false;
+
+                    setTimeout(() => {
+                        deja_att+=1
+                        player.setSize(32,64)
+                        attack=false
+                        actd=false
+                        this.input.keyboard.enabled = true;
+                    },300);  
+                }
+                else if (cursors.space.isDown && sens=='gauche' && saut == false&& accroche==false&& truc==false && equipe=="epee" && player.body.blocked.down){
+                    if (deja_att%2==0){
+                        player.anims.play('att1G', true)
+                    }
+                    else if(deja_att%2!=0){
+                        player.anims.play('att2G',true)
+                    }
+                    player.setVelocityX(-20)
+                    player.setSize(80,75)
+                    player.setOffset(0,0)
+                    attack=true
+                    actg=true
+                    cursors.right.reset();
+                    cursors.left.reset();
+                    cursors.up.reset();
+                    cursors.down.reset();
+                    cursors.space.reset();
+                    this.input.keyboard.enabled = false;
+
+                    setTimeout(() => {
+                        deja_att+=1
+                        player.setSize(32,64)
+                        attack=false
+                        actg=false
+                        this.input.keyboard.enabled = true;
+                    },300); }
+
+                if (cursors.space.isDown && sens=='droite' && saut==true&& accroche==false&& truc==false && equipe=="epee"){
+                player.anims.play('piqueD', true)
+                pique=true
+                player.setSize(32,128)
+                player.setOffset(0,0)
+                attack=true
+                this.attack
+                actd=true
+                player.setVelocityX(0)
+                player.setVelocityY(500)
+                cursors.right.reset();
+                cursors.left.reset();
+                cursors.up.reset();
+                cursors.down.reset();
+                cursors.space.reset()
+                this.input.keyboard.enabled = false;
+
+                  
+            }
+            if (cursors.space.isDown && sens=='gauche' && saut==true&& accroche==false&& truc==false && equipe=="epee"){
+                player.anims.play('piqueG', true)
+                pique=true
+                player.setSize(32,128)
+                player.setOffset(0,0)
+                attack=true
+                this.attack
+                actd=true
+                player.setVelocityX(0)
+                player.setVelocityY(500)
+                cursors.right.reset();
+                cursors.left.reset();
+                cursors.up.reset();
+                cursors.down.reset();
+                cursors.space.reset()
+                this.input.keyboard.enabled = false; 
+            }
+
+            if (player.body.blocked.down && pique==true){
+                    player.setSize(32,64)
+                    pique=false
+                    attack=false
+                    actg=false
+                    actd=false
+                    this.input.keyboard.enabled = true;
+                }
+                
+
+                //Changement scene
+                if (life==0) {
+
+                    this.scene.start('GameOver');
+                }
+                if (player.x==4144 && player.y==2496){
+                    posx=40
+                    posy=3015
+                    this.scene.start('Marais',{ vie:vie, life:life });
+                    
+                }
+            
+
+        }
+            //Fonctions
+
+        attack(player,enemies){
+        if (attack==true){
+        enemies.disableBody(true, true);
+        }
+        }
+
+        haricot(player,haricot){
+            if(plante==true && player.body.velocity.x==0){
+                haricot.anims.play("plante",true)
+                setTimeout(() => {
+                    haricot.la=true
+                },300);
+                if (sens=='droite'){
+                    player.x-=32
+                }
+                else if (sens=='gauche'){
+                    player.x+=32
+                }
+            }
+        }
+
+        accroche(player,haricot){
+            accroche=true
+            saut=false
+            cursors.right.reset()
+            cursors.left.reset()
+            //player.setOffset(32,0)
+            //player.setSize(2,64)
+            
+        }
+
+        grapple(grappin,prise){
+            if(grappinActive==true){
+                player.x=prise.x
+                grappin.setVelocityX(0)
+                grappin.setVisible(false)
+                grappAccroch=true
+                grappinActive=false
+                setTimeout(() => {
+                    grappAccroch=false
+                },300);      
+            }
+            if (grappinActiveHaut==true){
+                player.setVelocityY(-750)
+                grappin.setVelocityX(0)
+                grappin.setVisible(false)
+                grappAccroch=true
+                grappinActiveHaut=false
+                setTimeout(() => {
+                    grappAccroch=false
+                },300); 
+            }
+
+        }
+        hitEnemy (player, enemies) {
+                if (pique==true){
+                    enemies.disableBody(true,true)
+                    player.setVelocityY(-425)
+                }
+                if (attack==false){
+                    if (vulnerable==true){
+                vie-=1
+                vulnerable=false
+                player.setTint(0xff0000)
+                if (sens=="gauche"){
+                    player.setVelocityX(250)
+                }
+                if (sens=="droite"){
+                    player.setVelocityX(-250)
+                }
+                setTimeout(()=> {
+                    player.setTint(0xffffff)
+                    vulnerable=true
+                },1000)
+                
+                }
+                }
+            }
+
+            hitBoss(){
+                if (bossLife>0){
+                    if (bossVulnerable==true){
+                    bossLife-=1
+                    bossVulnerable=false
+                    boss.setVelocityX(0)
+                    boss.setVelocityY(0)
+                    boss.setTint(0xff0000)
+                    setTimeout(()=>{
+                        boss.setTint(0xffffff)
+                        bossVulnerable=true
+                    },1000)
+                    
+                    }
+                }
+                else{
+                    boss.disableBody(true,true)
+                    boss_vaincu+=1
+                }
+            }
+            AfficheText(player,pnj){
+                textbox.setVisible(true)
+                text.setVisible(true)
+                texteDit=true
+                haricot_possede=true
+                if (cursors.space.isDown){
+                    texteDit=false
+                    pnj.disableBody(true,true)
+                    textbox.setVisible(false)
+                    text.setVisible(false)
+                }
+            }
+
+            check(player,checkpoint){
+                posx=checkpoint.x
+                posy=checkpoint.y
+            }
+            mort(player){
+                if (life>0){
+                player.x=posx
+                player.y=posy
+                vie-=1
+                }
+                if (vie<=0){
+                    vie=4
+                    life-=1   
+                }
+            }
+
+            majLife(){
+                if (vie==4){
+                afficheVie.setFrame(0)
+                }
+                if (vie==3){
+                afficheVie.setFrame(1)
+                }
+                if (vie==2){
+                afficheVie.setFrame(2)
+                }
+                if (vie==1){
+                afficheVie.setFrame(3)
+                }
+                if (vie==0){
+                afficheVie.setFrame(4)
+                }
+                if (life==3){
+                    afficheVie2.setFrame(0)
+                }
+                if (life==2){
+                    afficheVie2.setFrame(1)
+                }
+                if (life==1){
+                    afficheVie2.setFrame(2)
+                }
+                if (life==0){
+                    afficheVie2.setFrame(3)
+                }
+            }
+            heal(player,soin){
+                vie=4
+                life=3
+                soin.disableBody(true,true)
+            }
+
+        }
+
+
+        class Marais extends Phaser.Scene {
+            constructor() {
+                super("Marais");
+            }
+
+            preload() {
+                this.load.image('soin','assets/panier.png')
+                this.load.spritesheet('perso','assets/Red_Move.png',
+                    {frameWidth:32, frameHeight:64 });
+                this.load.spritesheet('perso_att','assets/Red_Attack_2.png',
+                    {frameWidth:96, frameHeight:86 });
+                this.load.spritesheet('perso_marche','assets/Red_Walk.png',
+                    {frameWidth:34, frameHeight:64 });
+                this.load.spritesheet('perso_saut','assets/Red_Jump_2.png',
+                    {frameWidth:32, frameHeight:70 });
+                this.load.spritesheet('perso_attd','assets/Red_AttackDown.png',
+                    {frameWidth:33, frameHeight:124 });
+                this.load.spritesheet('perso','assets/Red_Move.png',
+                    {frameWidth:32, frameHeight:64 });
+                this.load.spritesheet('vine','assets/vine.png',
+                    {frameWidth:32, frameHeight:320 });
+                this.load.image('finHar','assets/fin_haricot.png')
+                this.load.image('bout','assets/bout_vine.png')
+
+                this.load.image('priseD1','assets/PriseD1.png')
+                this.load.image('priseG1','assets/PriseG1.png')
+                this.load.image('priseD2','assets/PriseD2.png')
+                this.load.image('priseG2','assets/PriseG2.png')
+                this.load.image('priseHautD1','assets/PriseHautD1.png')
+                this.load.image('priseHautG1','assets/PriseHautG1.png')
+                this.load.image('priseMur','assets/PriseMur.png')
+
+
+                this.load.spritesheet('frog','assets/Frog.png',
+                    {frameWidth:64, frameHeight:64 });
+                this.load.spritesheet('epice','assets/Ginger.png',
+                    {frameWidth:32, frameHeight:64 });
+
+
+                this.load.image('raiponce','assets/Raiponce.png')
+                this.load.image('textbox','assets/Box.png')
+                this.load.spritesheet('check','assets/Checkpoint.png',
+                    {frameWidth:32, frameHeight:32 })
+                this.load.image('UI','assets/UI.png')
+                this.load.image('UI2','assets/UI2.png')
+                this.load.spritesheet('coeur','assets/coeur.png',
+                    {frameWidth:128, frameHeight:32 })
+                this.load.spritesheet('vie','assets/Life.png',
+                    {frameWidth:96, frameHeight:25 })
+                this.load.image('epee','assets/sword.png')
+                this.load.image('Equipgrappin','assets/grappin.png')
+                this.load.image('haricUI','assets/haricot.png')
+                
+
+                this.load.spritesheet('grappin','assets/grap.png',
+                    {frameWidth:32, frameHeight:32})
+                
+                this.load.spritesheet('perso_grap','assets/Red_Grapside.png',
+                    {frameWidth:896, frameHeight:64})
+                this.load.spritesheet('perso_grapUp','assets/Red_GrapUp2.png',
+                    {frameWidth:32, frameHeight:446})
+
+
+                this.load.image("Phaser_tuilesdejeu", "assets/Niveau/Placeholder_Tileset.png");
+                this.load.image("Fond","assets/Niveau/Niveau_Marais_Fond.png")
+                this.load.image("Branches","assets/Niveau/Niveau_Marais_Branches.png")
+
+                // chargement de la carte
+                this.load.tilemapTiledJSON("carte1", "assets/Niveau/Niveau_Marais.json"); 
+
+            }
+
+
+
+            create() {
+
+
+                enemies =this.physics.add.group({
+                    setCollideWorldBounds : true,
+                    origin:0,
+                    type:"Toto"
+                })
+
+                meuble= this.physics.add.group({
+                    immovable:true,
+                    allowGravity : false,
+                })
+
+                haricot= this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true,
+                    la:false
+                    
+                })
+
+                finHaricot= this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true,
+                })
+
+                bout=this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true,
+                })
+
+                prise=this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true
+                })
+                checkpoint=this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true
+                })
+                vide= this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true
+                })
+
+                cursors = this.input.keyboard.createCursorKeys();
+
+
+                const carteDuNiveau = this.add.tilemap("carte1");
+
+                // chargement du jeu de tuiles
+                const tileset = carteDuNiveau.addTilesetImage(
+                        "Placeholder_Tileset",
+                        "Phaser_tuilesdejeu"
+                        );  ;
+
+                this.add.image(2080, 1600, 'Fond');
+                
+
+                // chargement du calque calque_background
+                const calque_background = carteDuNiveau.createLayer(
+                        "Background",
+                        tileset
+                        );
+
+                this.add.image(2080, 1600, 'Branches');
+
+                // chargement du calque calque_plateformes
+                const calque_plateformes = carteDuNiveau.createLayer(
+                        "Niveau",
+                        tileset
+                        );
+                
+                
+
+                calque_plateformes.setCollisionByProperty({ estSolide: true }); 
+
+                var har1=haricot.create(1456,2928-144,'vine')
+                var har2=haricot.create(2256,2608-144,'vine')
+                var har3=haricot.create(1264,1776-144,'vine')
+                var har4=haricot.create(1456,1488-144,'vine')
+                
+
+                var finHar1=finHaricot.create(1456,2928-320,'finHar')
+                var finHar2=finHaricot.create(2256,2608-320,'finHar')
+                var finHar3=finHaricot.create(1264,1776-320,'finHar')
+                var finHar4=finHaricot.create(1456,1488-320,'finHar')
+                
+                finHaricot.setVisible(false)
+
+                var boutHar1=bout.create(1456,2928-288,'bout')
+                var boutHar2=bout.create(2256,2608-288,'bout')
+                var boutHar3=bout.create(1264,1776-288,'bout')
+                var boutHar4=bout.create(1456,1488-288,'bout')
+                
+                bout.setVisible(false)
+                bout.getChildren().forEach(b => {
+                    b.setSize(30,32)
+                })
+
+                var pris1=prise.create(2480,1488,'priseG1')
+                var pris2=prise.create(2896,1488,'priseD1')
+                var pris3=prise.create(3568,3088,'priseG1')
+                var pris4=prise.create(3952,3088,'priseD1')
+                var pris5=prise.create(3408,1296,'priseHautD1')
+                var pris6=prise.create(3440,2320,'priseHautG1')
+                var pris7=prise.create(3024,2128,'priseG2')
+                var pris8=prise.create(3440,2128,'priseD2')
+                var pris8=prise.create(2416,2608,'priseMur')
+
+                grappin= this.physics.add.sprite(40,100,'grappin')
+                grappin.setVisible(false)
+                grappin.body.setAllowGravity(false)
+                
+                soin=this.physics.add.sprite(3504,1248,'soin')
+                
+                var check1=checkpoint.create(1632,2624,'check')
+                
+                player = this.physics.add.sprite(posx,posy, 'perso');
+                player.setCollideWorldBounds(true);
+
+                
+                var trou1=vide.create(2736,2256,'bout')
+                trou1.setSize(640,32)
+                var trou2=vide.create(3776,3184,'bout')
+                trou2.setSize(256,32)
+                var trou3=vide.create(640,3184,'bout')
+                trou3.setSize(448,32)
+                var trou4=vide.create(2576,3184,'bout')
+                trou4.setSize(448,32)
+                vide.setVisible(false)
+                
+                var check1=checkpoint.create(1632,2624,'check')
+
+                var enemy1=enemies.create(1008,2880,'frog')
+                enemy1.type='frog'
+                var enemy2=enemies.create(1104,2912,'frog')
+                enemy2.type='frog'
+                var enemy3=enemies.create(2000,2576,'epice')
+                enemy3.type='epice'
+                var enemy4=enemies.create(2000,2064,'epice')
+                enemy4.type='epice'
+                var enemy5=enemies.create(1744,1664,'epice')
+                enemy5.type='epice'
+                var enemy6=enemies.create(3312,1408,'frog')
+                enemy6.type='frog'
+                var enemy7=enemies.create(3888,1600,'epice')
+                enemy7.type='epice'
+                var enemy8=enemies.create(3792,2304,'epice')
+                enemy8.type='epice'
+                var enemy9=enemies.create(3056,3008,'epice')
+                enemy9.type='epice'
+                
+                enemies.getChildren().forEach(enemy => {
+                    enemy.origin=enemy.x
+                })
+
+                pnj=this.physics.add.sprite(2384,1456,'raiponce')
+                pnj.body.immovable=true
+
+                ui=this.physics.add.sprite(250,110,'UI').setScrollFactor(0);//345
+                ui.setScale(.7)
+                ui.body.setAllowGravity(false)
+                ui2=this.physics.add.sprite(380,110,'UI2').setScrollFactor(0)
+                ui2.setScale(.7)
+                ui2.body.setAllowGravity(false)
+                afficheEpee=this.physics.add.sprite(380,110,'epee').setScrollFactor(0)
+                afficheEpee.body.setAllowGravity(false)
+                afficheEpee.setVisible(false)
+                afficheGrappin=this.physics.add.sprite(380,110,'Equipgrappin').setScrollFactor(0)
+                afficheGrappin.body.setAllowGravity(false)
+                afficheGrappin.setScale(.7)
+                afficheGrappin.setVisible(false)
+                afficheVie=this.physics.add.sprite(220,110,'coeur').setScrollFactor(0);
+                afficheVie.body.setAllowGravity(false)
+                afficheVie2=this.physics.add.sprite(315,100,'vie').setScrollFactor(0);
+                afficheVie2.body.setAllowGravity(false)
+                afficheVie2.setScale(.6)
+                objet1=this.physics.add.sprite(300,120,'haricUI').setScrollFactor(0);
+                objet1.body.setAllowGravity(false)
+                objet1.setScale(.7)
+                objet1.setVisible(false)
+                objet2=this.physics.add.sprite(330,117,'Equipgrappin').setScrollFactor(0);
+                objet2.body.setAllowGravity(false)
+                objet2.setScale(.6)
+                objet2.setVisible(false)
+
+                textbox=this.physics.add.sprite(2383,1360,'textbox')
+                text=this.add.text(275, 85, 'Merci de m avoir sauvé.\nPour te remercier prend une de \nmes meches.\nFais en un grappin avec Ctrl', { fontSize: '16px',fill:'#fff' }).setScrollFactor(0);
+                textbox.setVisible(false)
+                textbox.body.setAllowGravity(false)
+                text.setVisible(false)
+
+                this.physics.add.collider(player, calque_plateformes);
+                this.physics.add.collider(soin, calque_plateformes);
+                this.physics.add.collider(player,finHaricot)
+                this.physics.add.collider(player,bout)
+                this.physics.add.collider(player, enemies, this.hitEnemy);
+                this.physics.add.collider(player,boss, this.hitEnemy)
+                this.physics.add.collider(player,pnj,this.AfficheText)
+                this.physics.add.collider(player,vide,this.mort)
+                
+                this.physics.add.collider(enemies,calque_plateformes);
+                this.physics.add.collider(pnj,calque_plateformes);
+                this.physics.add.collider(grappin,prise,this.grapple)
+
+
+                this.physics.add.overlap(player, enemies,this.attack)
+                this.physics.add.overlap(player, boss, this.hitBoss)
+                this.physics.add.overlap(player,haricot,this.haricot)
+                this.physics.add.overlap(player,checkpoint,this.check)
+                this.physics.add.overlap(player,soin,this.heal)
+                
+
+
+                // redimentionnement du monde avec les dimensions calculées via tiled
+                this.physics.world.setBounds(0, 0, 4160, 3200);
+                //  ajout du champs de la caméra de taille identique à celle du monde
+                this.cameras.main.setBounds(0, 0, 4160, 3200);
+                // ancrage de la caméra sur le joueur
+                this.cameras.main.startFollow(player);
+                this.cameras.main.setZoom(0.5);
+                
+
+                ctrl= this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL);
+
+
+                //Animations
+                this.anims.create({
+                    key: 'left',
+                    frames: this.anims.generateFrameNumbers('perso_marche', { start: 4, end: 7 }),
+                    frameRate: 10,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'turnD',
+                    frames: this.anims.generateFrameNumbers('perso', { start: 0, end: 3 }),
+                    frameRate: 4,
+                    repeat:-1
+                });
+                this.anims.create({
+                    key: 'turnG',
+                    frames: this.anims.generateFrameNumbers('perso', { start: 15, end: 12 }),
+                    frameRate: 4,
+                    repeat:-1
+                });
+                this.anims.create({
+                    key: 'right',
+                    frames: this.anims.generateFrameNumbers('perso_marche', { start: 0, end: 3 }),
+                    frameRate: 10,
+                    repeat: -1
+                    
+                });
+                this.anims.create({
+                    key: 'upD',
+                    frames: this.anims.generateFrameNumbers('perso_saut', { start: 1, end: 5 }),
+                    frameRate: 6,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'upG',
+                    frames: this.anims.generateFrameNumbers('perso_saut', { start: 13, end: 8 }),
+                    frameRate: 6,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'climbG',
+                    frames: this.anims.generateFrameNumbers('perso', { start: 11, end: 8 }),
+                    frameRate: 6,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'climbD',
+                    frames: this.anims.generateFrameNumbers('perso', { start: 4, end: 7 }),
+                    frameRate: 6,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'accroG',
+                    frames: [{ key: 'perso', frame :11}],
+                    frameRate: 5,
+                });
+                this.anims.create({
+                    key: 'accroD',
+                    frames: [{ key: 'perso', frame :4}],
+                    frameRate: 5,
+                })
+                this.anims.create({
+                    key: 'att1G',
+                    frames: this.anims.generateFrameNumbers('perso_att', { start: 11, end: 9 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'att1D',
+                    frames: this.anims.generateFrameNumbers('perso_att', { start: 0, end: 2 }),
+                    frameRate: 5,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'att2G',
+                    frames: this.anims.generateFrameNumbers('perso_att', { start: 8, end: 6 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'att2D',
+                    frames: this.anims.generateFrameNumbers('perso_att', { start: 3, end: 5 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'piqueG',
+                    frames: [{ key: 'perso_attd', frame :1}],
+                    frameRate: 5,
+
+                });
+                this.anims.create({
+                    key: 'piqueD',
+                    frames: [{ key: 'perso_attd', frame :0}],
+                    frameRate: 5,
+
+                });
+                this.anims.create({
+                    key: 'plante',
+                    frames: this.anims.generateFrameNumbers('vine', { start: 0, end: 10}),
+                    frameRate: 12,
+                    repeat: 0
+
+                });
+                this.anims.create({
+                    key: 'grapD',
+                    frames: this.anims.generateFrameNumbers('perso_grap', { start: 0, end: 11}),
+                    frameRate: 12,
+                    repeat: -1
+
+                });
+                this.anims.create({
+                    key: 'grapG',
+                    frames: this.anims.generateFrameNumbers('perso_grap', { start: 12, end: 23}),
+                    frameRate: 12,
+                    repeat: -1
+
+                });
+                this.anims.create({
+                    key: 'grapUD',
+                    frames: this.anims.generateFrameNumbers('perso_grapUp', { start: 0, end: 4}),
+                    frameRate: 12,
+                    repeat: -1
+
+                });
+                this.anims.create({
+                    key: 'grapUG',
+                    frames: this.anims.generateFrameNumbers('perso_grapUp', { start: 9, end: 5}),
+                    frameRate: 12,
+                    repeat: -1
+
+                });
+                this.anims.create({
+                    key: 'livre',
+                    frames: this.anims.generateFrameNumbers('check', { start: 0, end: 3}),
+                    frameRate: 5,
+                    repeat: -1
+
+                });
+                this.anims.create({
+                    key: 'oursG',
+                    frames: this.anims.generateFrameNumbers('ours', { start: 0, end: 1 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+
+                this.anims.create({
+                    key: 'oursD',
+                    frames: this.anims.generateFrameNumbers('ours', { start: 2, end: 3 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'nainG',
+                    frames: this.anims.generateFrameNumbers('nain', { start: 0, end: 3 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'nainD',
+                    frames: this.anims.generateFrameNumbers('nain', { start: 4, end: 7 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'geantG',
+                    frames: this.anims.generateFrameNumbers('geant', { start: 0, end: 3}),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'frogG',
+                    frames: this.anims.generateFrameNumbers('frog', { start: 0, end: 1 }),
+                    frameRate: 2,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'frogD',
+                    frames: this.anims.generateFrameNumbers('frog', { start: 2, end: 3 }),
+                    frameRate: 2,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'epiceG',
+                    frames: this.anims.generateFrameNumbers('epice', { start: 0, end: 1 }),
+                    frameRate: 5,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'epiceD',
+                    frames: this.anims.generateFrameNumbers('epice', { start: 2, end: 3 }),
+                    frameRate: 5,
+                    repeat: -1
+                });
+            }
+
+
+
+            update() {
+                
+                console.log(player.x)
+                console.log(player.y)
+                console.log(equipe)
+                console.log(posx)
+                console.log(posy)
+
+                this.majLife()
+                
+
+                if (cursors.space.isDown&& texteDit==true){
+                    text.setVisible(false)
+                    textbox.setVisible(false)
+                    texteDit=false
+                }
+
+                checkpoint.getChildren().forEach(check => {
+                    check.anims.play('livre',true)
+                })
+
+                if (vie==0){
+                    this.mort(player)
+                }
+
+                
+                // IA Ennemis
+
+                enemies.getChildren().forEach(enemy => {
+                if (enemy.type=='frog'){
+                    enemy.setSize(32,32)
+                }
+                if (enemy.type=="ours" || enemy.type=="nain" || enemy.type=="bird" ||enemy.type=="epice"){
+                    if (enemy.x<=enemy.origin){
+                        enemy.anims.play(enemy.type+'D', true);
+                        enemy.setVelocityX(150)
+                    }
+                    else if (enemy.x>enemy.origin+192){
+                        enemy.anims.play(enemy.type+'G', true);
+                        enemy.setVelocityX(-150)
+                    }
+                }
+                if (enemy.type=="frog" && enemy.body.blocked.down){
+                    //setTimeout(() => {
+                        enemy.setVelocityY(-450)
+                    if (enemy.x<=enemy.origin+100){
+                        enemy.setVelocityX(100)
+                        enemy.anims.play(enemy.type+'D', true);
+                    }
+                    else if (enemy.x>enemy.origin+199){
+                        enemy.setVelocityX(-100)
+                        enemy.anims.play(enemy.type+'G', true);
+                }
+                    //},1000); }
+                    }})
+
+                
+
+                // UI
+                if (ctrl.isDown&& grappin_possede==true){
+                    ctrl.reset()
+                    if (equipe=="epee"){
+                        equipe="grappin"
+                    }
+                    else if (equipe=="grappin"){
+                        equipe="epee"  
+                    }
+                }
+
+                if (equipe=="epee"){
+                        afficheEpee.setVisible(true)
+                        afficheGrappin.setVisible(false)
+                        this.cameras.main.setZoom(1.5)
+                        ui.x=250
+                        ui.y=110
+                        ui.setScale(.7)
+                        ui2.x=380
+                        ui2.y=110
+                        ui2.setScale(.7)
+                        afficheVie.x=220
+                        afficheVie.y=110
+                        afficheVie.setScale(1)
+                        afficheVie2.x=315
+                        afficheVie2.y=100
+                        afficheVie2.setScale(.6)
+                        objet1.x=300
+                        objet1.y=120
+                        objet1.setScale(.7)
+                        objet2.x=330
+                        objet2.y=117
+                        objet2.setScale(.6)
+                        
+                    }
+                    else if (equipe=="grappin"){
+                        afficheEpee.setVisible(false)
+                        afficheGrappin.setVisible(true)
+                        this.cameras.main.setZoom(1)
+                        ui.x=150
+                        ui.y=50
+                        ui.setScale(1)
+                        ui2.x=340
+                        ui2.y=50
+                        ui2.setScale(1)
+                        afficheVie.x=103
+                        afficheVie.y=50
+                        afficheVie.setScale(1.4)
+                        afficheVie2.x=240
+                        afficheVie2.y=40
+                        afficheVie2.setScale(.9)
+                        objet1.x=220
+                        objet1.y=65
+                        objet1.setScale(1)
+                        objet2.x=260
+                        objet2.y=62
+                        objet2.setScale(.7)
+                        afficheGrappin.x=350
+                        afficheGrappin.y=45
+                        afficheGrappin.setScale(1.3)
+                    }
+                if (haricot_possede==true){
+                    objet1.setVisible(true)
+                }
+                if (grappin_possede==true){
+                    objet2.setVisible(true)
+                }
+
+                //Grappin
+                if (grappinActive==false && grappinActiveHaut==false){
+                    grappin.x=player.x
+                    grappin.y=player.y
+                }
+
+                if(cursors.space.isDown && sens=='droite'&& equipe=="grappin" && saut==false && cursors.up.isDown&& texteDit==false){
+                    grappinActiveHaut=true
+                    grappin.setFrame(1)
+                    grappin.setVisible(true)
+                    player.anims.play('grapUD',true)
+                    grappin.setVelocityY(-350)
+                    cursors.right.reset();
+                    cursors.left.reset();
+                    cursors.up.reset();
+                    cursors.down.reset();
+                    cursors.space.reset();
+                    ctrl.reset()
+                    this.input.keyboard.enabled = false;
+                }
+
+                if(cursors.space.isDown && sens=='gauche' && equipe=="grappin" && saut==false && cursors.up.isDown&& texteDit==false){
+                    grappinActiveHaut=true
+                    grappin.setFrame(1)
+                    grappin.setVisible(true)
+                    player.anims.play('grapUG',true)
+                    grappin.setVelocityY(-350)
+                    cursors.right.reset();
+                    cursors.left.reset();
+                    cursors.up.reset();
+                    cursors.down.reset();
+                    cursors.space.reset();
+                    ctrl.reset()
+                    this.input.keyboard.enabled = false;
+                }
+
+                if(cursors.space.isDown && equipe=="grappin" && saut==false){
+                    grappin.setFrame(0)
+                    grappinActive=true
+                    grappin.setVisible(true)
+                    if (sens=='droite'){
+                        player.anims.play('grapD',true)
+                        grappin.setVelocityX(350)
+                        cursors.right.reset();
+                        cursors.left.reset();
+                        cursors.up.reset();
+                        cursors.down.reset();
+                        cursors.space.reset();
+                        ctrl.reset()
+                        this.input.keyboard.enabled = false;
+                        
+                    }
+                    else if (sens=='gauche'){
+                        grappin.setFrame(3)
+                        player.anims.play('grapG',true)
+                        grappin.setVelocityX(-350)
+                        cursors.right.reset();
+                        cursors.left.reset();
+                        cursors.up.reset();
+                        cursors.down.reset();
+                        cursors.space.reset();
+                        ctrl.reset()
+                        this.input.keyboard.enabled = false;
+                        
+                    }}
+
+                if (grappin.x-player.x>=384 || player.x-grappin.x>=384 || grappAccroch==true || player.y-grappin.y>=160){
+                    grappin.setVelocityX(0)
+                    grappin.setVelocityY(0)
+                    grappinActiveHaut=false
+                    grappinActive=false
+                    grappin.setVisible(false)
+                    this.input.keyboard.enabled = true;
+                }
+                
+                //Haricot
+
+                haricot.getChildren().forEach(haric => {
+                if (haric.la==true) {
+                    this.physics.add.collider(player,haric,this.accroche)
+                }})
+
+                finHaricot.getChildren().forEach(finHaric => {
+                    if (accroche==true){
+                        finHaric.setSize(96,32)
+                    }})
+
+                //if (accroche==false){
+                    //player.setSize(32,64)
+                    //player.setOffset(32,64)
+                //}
+
+                if(accroche==true){
+                    
+                    truc=true
+                    player.body.setAllowGravity(false)
+                    
+                    
+                    if (cursors.space.isDown){
+                        player.body.setAllowGravity(true)
+                        player.setVelocityY(-425)
+                        if (sens=="gauche"){
+                            player.anims.play("upD",true)
+                        }
+                        if (sens=="droite"){
+                            player.anims.play("upG",true)
+                        }
+                        saut=true
+
+                        finHaricot.getChildren().forEach(finHaric => {
+                    if(saut==true ){
+                        finHaric.setOffset(-5000,0)
+                    }
+                })
+
+                        accroche=false
+                        setTimeout(() => {
+                        truc=false
+                    },300);  
+
+                    }
+                    if (cursors.down.isDown) {
+                    if (sens=="gauche"){
+                            player.anims.play("climbG",true)
+                    }
+                    if (sens=="droite"){
+                        player.anims.play("climbD",true)
+                    }
+                    player.setVelocityY(250);
+                    }
+
+                    else if(cursors.left.isDown && sens=='gauche'){
+                        player.x=player.x-64
+                        sens='droite'
+                    }
+
+                    else if(cursors.right.isDown && sens=='droite'){
+                        player.x=player.x+64
+                        sens='gauche'
+                    }
+
+                    else if (cursors.up.isDown) {
+                        if (sens=="gauche"){
+                            player.anims.play("climbG",true)
+                    }
+                    if (sens=="droite"){
+                        player.anims.play("climbD",true)
+                    } 
+                        player.setVelocityY(-250);
+                    }
+
+                    else if (accroche==true){
+                        player.setVelocityY(0);
+                        if (sens=="gauche" ){
+                        player.anims.play("accroG",true)
+                    }
+                    if (sens=="droite"){
+                        player.anims.play("accroD",true)
+                    }
+                                    }
+                                }
+
+                if(cursors.shift.isDown && haricot_possede==true){
+                    plante=true
+                    setTimeout(() => {
+                        plante=false
+                    },300); }
+                
+
+                //Deplacement
+
+                if (cursors.left.isDown && accroche==false && texteDit==false) { //si la touche gauche est appuyée
+                    if (saut==false){
+                    player.anims.play('left', true);}
+                    sens= 'gauche'
+                    if (saut==false){
+                    player.setVelocityX(-250); //alors vitesse négative en X
+                    }
+                    if (saut==true){
+                    player.setVelocityX(-200); //alors vitesse négative en X
+                    }
+                    
+                }
+                else if (cursors.right.isDown && accroche==false&& texteDit==false) { //sinon si la touche droite est appuyée
+                    if (saut==false){
+                    player.anims.play('right', true);}
+                    sens= 'droite'
+                    if (saut==false){
+                    player.setVelocityX(250); //alors vitesse négative en X
+                    }
+                    if (saut==true){
+                    player.setVelocityX(200); //alors vitesse négative en X
+                    }
+                }
+
+                else { // sinon
+                    if (saut==false&&attack==false&&accroche==false){
+                    player.setVelocityX(0); //vitesse nulle
+                    if(sens=="gauche"){
+                    player.anims.play('turnG', true)
+                    };
+                    if(sens=="droite"){
+                    player.anims.play('turnD', true)
+                    }}
+                }
+
+                if (cursors.up.isDown && player.body.blocked.down && saut==false && equipe=="epee"&& texteDit==false) {
+                    saut = true
+                    player.setVelocityY(-425);
+                    if(sens=="gauche"){
+                    player.anims.play('upG', true)
+                    };
+                    if(sens=="droite"){
+                    player.anims.play('upD', true)
+                    }
+                }
+                
+                else if  (player.body.blocked.down){
+                    saut=false
+                }
+
+                if(saut==true){
+                    player.setOffset(0,6)
+                }
+                else if(saut==false){
+                    player.setOffset(0,0)
+                }
+
+                //Attaque 
+
+                if (cursors.space.isDown && sens=='droite' && saut == false && accroche==false && truc==false && equipe=="epee" && player.body.blocked.down){
+                    if (deja_att%2==0){
+                        player.anims.play('att1D', true)
+                    }
+                    else if(deja_att%2!=0){
+                        player.anims.play('att2D',true)
+                    }
+                    player.setVelocityX(20)
+                    player.setSize(80,75)
+                    player.setOffset(16,0)
+                    attack=true
+                    actd=true
+                    cursors.right.reset();
+                    cursors.left.reset();
+                    cursors.up.reset();
+                    cursors.down.reset();
+                    cursors.space.reset();
+                    this.input.keyboard.enabled = false;
+
+                    setTimeout(() => {
+                        deja_att+=1
+                        player.setSize(32,64)
+                        attack=false
+                        actd=false
+                        this.input.keyboard.enabled = true;
+                    },300);  
+                }
+                else if (cursors.space.isDown && sens=='gauche' && saut == false&& accroche==false&& truc==false && equipe=="epee" && player.body.blocked.down){
+                    if (deja_att%2==0){
+                        player.anims.play('att1G', true)
+                    }
+                    else if(deja_att%2!=0){
+                        player.anims.play('att2G',true)
+                    }
+                    player.setVelocityX(-20)
+                    player.setSize(80,75)
+                    player.setOffset(0,0)
+                    attack=true
+                    actg=true
+                    cursors.right.reset();
+                    cursors.left.reset();
+                    cursors.up.reset();
+                    cursors.down.reset();
+                    cursors.space.reset();
+                    this.input.keyboard.enabled = false;
+
+                    setTimeout(() => {
+                        deja_att+=1
+                        player.setSize(32,64)
+                        attack=false
+                        actg=false
+                        this.input.keyboard.enabled = true;
+                    },300); }
+
+                if (cursors.space.isDown && sens=='droite' && saut==true&& accroche==false&& truc==false && equipe=="epee"){
+                player.anims.play('piqueD', true)
+                pique=true
+                player.setSize(32,128)
+                player.setOffset(0,0)
+                attack=true
+                this.attack
+                actd=true
+                player.setVelocityX(0)
+                player.setVelocityY(500)
+                cursors.right.reset();
+                cursors.left.reset();
+                cursors.up.reset();
+                cursors.down.reset();
+                cursors.space.reset()
+                this.input.keyboard.enabled = false;
+
+                  
+            }
+            if (cursors.space.isDown && sens=='gauche' && saut==true&& accroche==false&& truc==false && equipe=="epee"){
+                player.anims.play('piqueG', true)
+                pique=true
+                player.setSize(32,128)
+                player.setOffset(0,0)
+                attack=true
+                this.attack
+                actd=true
+                player.setVelocityX(0)
+                player.setVelocityY(500)
+                cursors.right.reset();
+                cursors.left.reset();
+                cursors.up.reset();
+                cursors.down.reset();
+                cursors.space.reset()
+                this.input.keyboard.enabled = false; 
+            }
+
+            if (player.body.blocked.down && pique==true){
+                    player.setSize(32,64)
+                    pique=false
+                    attack=false
+                    actg=false
+                    actd=false
+                    this.input.keyboard.enabled = true;
+                }
+                
+
+                //Changement scene
+                if (life==0) {
+
+                    this.scene.start('GameOver');
+                }
+                if (player.x==1713 && player.y==1152) {
+                    posx=144
+                    posy=0
+                this.scene.start('Witch',{ vie:vie, life:life });
+                }
+                if (player.x==4144 && player.y==3072) {
+                    posx=40
+                    posy=3008
+                this.scene.start('Tour',{ vie:vie, life:life });
+                }
+            
+
+        }
+            //Fonctions
+
+        attack(player,enemies){
+        if (attack==true){
+        enemies.disableBody(true, true);
+        }
+        }
+
+        haricot(player,haricot){
+            if(plante==true && player.body.velocity.x==0){
+                haricot.anims.play("plante",true)
+                setTimeout(() => {
+                    haricot.la=true
+                },300);
+                if (sens=='droite'){
+                    player.x-=32
+                }
+                else if (sens=='gauche'){
+                    player.x+=32
+                }
+            }
+        }
+
+        accroche(player,haricot){
+            accroche=true
+            saut=false
+            cursors.right.reset()
+            cursors.left.reset()
+            //player.setOffset(32,0)
+            //player.setSize(2,64)
+            
+        }
+
+        grapple(grappin,prise){
+            if(grappinActive==true){
+                player.x=prise.x
+                grappin.setVelocityX(0)
+                grappin.setVisible(false)
+                grappAccroch=true
+                grappinActive=false
+                setTimeout(() => {
+                    grappAccroch=false
+                },300);      
+            }
+            if (grappinActiveHaut==true){
+                player.setVelocityY(-750)
+                grappin.setVelocityX(0)
+                grappin.setVisible(false)
+                grappAccroch=true
+                grappinActiveHaut=false
+                setTimeout(() => {
+                    grappAccroch=false
+                },300); 
+            }
+
+        }
+        hitEnemy (player, enemies) {
+                if (pique==true){
+                    enemies.disableBody(true,true)
+                    player.setVelocityY(-425)
+                }
+                if (attack==false){
+                    if (vulnerable==true){
+                vie-=1
+                vulnerable=false
+                player.setTint(0xff0000)
+                if (sens=="gauche"){
+                    player.setVelocityX(250)
+                }
+                if (sens=="droite"){
+                    player.setVelocityX(-250)
+                }
+                setTimeout(()=> {
+                    player.setTint(0xffffff)
+                    vulnerable=true
+                },1000)
+                
+                }
+                }
+            }
+
+            hitBoss(){
+                if (bossLife>0){
+                    if (bossVulnerable==true){
+                    bossLife-=1
+                    bossVulnerable=false
+                    boss.setVelocityX(0)
+                    boss.setVelocityY(0)
+                    boss.setTint(0xff0000)
+                    setTimeout(()=>{
+                        boss.setTint(0xffffff)
+                        bossVulnerable=true
+                    },1000)
+                    
+                    }
+                }
+                else{
+                    boss.disableBody(true,true)
+                    boss_vaincu+=1
+                }
+            }
+            AfficheText(player,pnj){
+                textbox.setVisible(true)
+                text.setVisible(true)
+                texteDit=true
+                grappin_possede=true
+                if (cursors.space.isDown){
+                    texteDit=false
+                    pnj.disableBody(true,true)
+                    textbox.setVisible(false)
+                    text.setVisible(false)
+                }
+            }
+
+            check(player,checkpoint){
+                posx=checkpoint.x
+                posy=checkpoint.y
+            }
+            mort(player){
+                if (life>0){
+                player.x=posx
+                player.y=posy
+                vie-=1
+                }
+                if (vie<=0){
+                    vie=4
+                    life-=1   
+                }
+            }
+
+            majLife(){
+                if (vie==4){
+                afficheVie.setFrame(0)
+                }
+                if (vie==3){
+                afficheVie.setFrame(1)
+                }
+                if (vie==2){
+                afficheVie.setFrame(2)
+                }
+                if (vie==1){
+                afficheVie.setFrame(3)
+                }
+                if (vie==0){
+                afficheVie.setFrame(4)
+                }
+                if (life==3){
+                    afficheVie2.setFrame(0)
+                }
+                if (life==2){
+                    afficheVie2.setFrame(1)
+                }
+                if (life==1){
+                    afficheVie2.setFrame(2)
+                }
+                if (life==0){
+                    afficheVie2.setFrame(3)
+                }
+            }
+            heal(player,soin){
+                vie=4
+                life=3
+                soin.disableBody(true,true)
+            }
+
+        }
+
+        class Witch extends Phaser.Scene {
+            constructor() {
+                super("Witch");
+            }
+
+            preload() {
+                this.load.image('soin','assets/panier.png')
+                this.load.spritesheet('perso','assets/Red_Move.png',
+                    {frameWidth:32, frameHeight:64 });
+                this.load.spritesheet('perso_att','assets/Red_Attack_2.png',
+                    {frameWidth:96, frameHeight:86 });
+                this.load.spritesheet('perso_marche','assets/Red_Walk.png',
+                    {frameWidth:34, frameHeight:64 });
+                this.load.spritesheet('perso_saut','assets/Red_Jump_2.png',
+                    {frameWidth:32, frameHeight:70 });
+                this.load.spritesheet('perso_attd','assets/Red_AttackDown.png',
+                    {frameWidth:33, frameHeight:124 });
+                this.load.spritesheet('perso','assets/Red_Move.png',
+                    {frameWidth:32, frameHeight:64 });
+                this.load.spritesheet('vine','assets/vine.png',
+                    {frameWidth:32, frameHeight:320 });
+                this.load.image('finHar','assets/fin_haricot.png')
+                this.load.image('bout','assets/bout_vine.png')
+
+                this.load.spritesheet('witch','assets/Witch.png',
+                    {frameWidth:32, frameHeight:64 })
+                this.load.spritesheet('magie','assets/Magic.png',
+                    {frameWidth:32, frameHeight:32 })
+                this.load.image('plat','assets/plat.png')
+                this.load.image('platD','assets/platD.png')
+                this.load.image('platG','assets/platG.png')
+                this.load.image('porteH','assets/porteHaut.png')
+                this.load.image('porteB','assets/porteBas.png')
+
+
+                this.load.image('UI','assets/UI.png')
+                this.load.image('UI2','assets/UI2.png')
+                this.load.spritesheet('coeur','assets/coeur.png',
+                    {frameWidth:128, frameHeight:32 })
+                this.load.spritesheet('vie','assets/Life.png',
+                    {frameWidth:96, frameHeight:25 })
+                this.load.image('epee','assets/sword.png')
+                this.load.image('Equipgrappin','assets/grappin.png')
+                this.load.image('haricUI','assets/haricot.png')
+                
+
+                this.load.image('grappin','assets/Placeholder_grappin.png')
+
+
+                this.load.image("Phaser_tuilesdejeu", "assets/Niveau/Placeholder_Tileset.png");
+                
+                // chargement de la carte
+                this.load.tilemapTiledJSON("carte2", "assets/Niveau/WitchHome.json"); 
+
+            }
+
+
+
+            create() {
+
+
+                enemies =this.physics.add.group({
+                    setCollideWorldBounds : true,
+                    origin:0,
+                    type:"Toto"
+                })
+
+                meuble= this.physics.add.group({
+                    immovable:true,
+                    allowGravity : false,
+                })
+
+                haricot= this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true,
+                    la:false
+                    
+                })
+
+                finHaricot= this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true,
+                })
+
+                bout=this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true,
+                })
+
+                prise=this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true
+                })
+                checkpoint=this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true
+                })
+                vide= this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true
+                })
+                plateforme= this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true,
+                })
+                porte= this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true,
+                })
+
+                cursors = this.input.keyboard.createCursorKeys();
+
+
+                const carteDuNiveau = this.add.tilemap("carte2");
+
+                // chargement du jeu de tuiles
+                const tileset = carteDuNiveau.addTilesetImage(
+                        "Placeholder_Tileset",
+                        "Phaser_tuilesdejeu"
+                        );  ;
+
+                // chargement du calque calque_background
+                const calque_background = carteDuNiveau.createLayer(
+                        "Background1",
+                        tileset
+                        );
+
+                this.add.image(2080, 1600, 'Branches');
+
+                // chargement du calque calque_plateformes
+                const calque_plateformes = carteDuNiveau.createLayer(
+                        "Niveau",
+                        tileset
+                        );
+                
+                const calque_front = carteDuNiveau.createLayer(
+                        "Background2",
+                        tileset
+                        );
+                
+                calque_plateformes.setCollisionByProperty({ estSolide: true }); 
+
+
+                
+                player = this.physics.add.sprite(posx,posy, 'perso');
+                player.setCollideWorldBounds(true);
+
+                boss=this.physics.add.sprite(528,239,'witch')
+                boss.body.immovable=true
+                bossLife=3
+
+                magie=this.physics.add.sprite(32,32,'magie')
+                magie.body.setAllowGravity(false)
+
+                var plat1=plateforme.create(400,208,'platG')
+                var plat2=plateforme.create(432,208,'plat')
+                var plat3=plateforme.create(464,208,'platD')
+                var plat4=plateforme.create(240,208,'platD')
+                var plat5=plateforme.create(592,208,'platG')
+                plateforme.getChildren().forEach(plat => {
+                    plat.setSize(32,6)
+                    plat.setOffset(0,25)
+                })
+                porte1=porte.create(624,240,'porteH')
+                porte2=porte.create(624,272,'porteB')
+
+
+                ui=this.physics.add.sprite(250,110,'UI').setScrollFactor(0);//345
+                ui.setScale(.7)
+                ui.body.setAllowGravity(false)
+                ui2=this.physics.add.sprite(380,110,'UI2').setScrollFactor(0)
+                ui2.setScale(.7)
+                ui2.body.setAllowGravity(false)
+                afficheEpee=this.physics.add.sprite(380,110,'epee').setScrollFactor(0)
+                afficheEpee.body.setAllowGravity(false)
+                afficheEpee.setVisible(false)
+                afficheGrappin=this.physics.add.sprite(380,110,'Equipgrappin').setScrollFactor(0)
+                afficheGrappin.body.setAllowGravity(false)
+                afficheGrappin.setScale(.7)
+                afficheGrappin.setVisible(false)
+                afficheVie=this.physics.add.sprite(220,110,'coeur').setScrollFactor(0);
+                afficheVie.body.setAllowGravity(false)
+                afficheVie2=this.physics.add.sprite(315,100,'vie').setScrollFactor(0);
+                afficheVie2.body.setAllowGravity(false)
+                afficheVie2.setScale(.6)
+                objet1=this.physics.add.sprite(300,120,'haricUI').setScrollFactor(0);
+                objet1.body.setAllowGravity(false)
+                objet1.setScale(.7)
+                objet1.setVisible(false)
+                objet2=this.physics.add.sprite(330,117,'Equipgrappin').setScrollFactor(0);
+                objet2.body.setAllowGravity(false)
+                objet2.setScale(.6)
+                objet2.setVisible(false)
+
+
+                this.physics.add.collider(player, calque_plateformes);
+                this.physics.add.collider(boss, calque_plateformes);
+                this.physics.add.collider(player,boss, this.hitEnemy)
+                this.physics.add.collider(player,plateforme)
+                this.physics.add.collider(player,porte)
+
+                this.physics.add.overlap(player,magie,this.hitEnemy)
+                this.physics.add.overlap(player, boss, this.hitBoss)
+                
+
+
+                // redimentionnement du monde avec les dimensions calculées via tiled
+                this.physics.world.setBounds(0, 0, 640, 320);
+                //  ajout du champs de la caméra de taille identique à celle du monde
+                this.cameras.main.setBounds(0, 0, 640, 320);
+                // ancrage de la caméra sur le joueur
+                this.cameras.main.startFollow(player);
+                this.cameras.main.setZoom(0.5);
+                
+
+                ctrl= this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL);
+
+
+                //Animations
+                this.anims.create({
+                    key: 'left',
+                    frames: this.anims.generateFrameNumbers('perso_marche', { start: 4, end: 7 }),
+                    frameRate: 10,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'turnD',
+                    frames: this.anims.generateFrameNumbers('perso', { start: 0, end: 3 }),
+                    frameRate: 4,
+                    repeat:-1
+                });
+                this.anims.create({
+                    key: 'turnG',
+                    frames: this.anims.generateFrameNumbers('perso', { start: 15, end: 12 }),
+                    frameRate: 4,
+                    repeat:-1
+                });
+                this.anims.create({
+                    key: 'right',
+                    frames: this.anims.generateFrameNumbers('perso_marche', { start: 0, end: 3 }),
+                    frameRate: 10,
+                    repeat: -1
+                    
+                });
+                this.anims.create({
+                    key: 'upD',
+                    frames: this.anims.generateFrameNumbers('perso_saut', { start: 1, end: 5 }),
+                    frameRate: 6,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'upG',
+                    frames: this.anims.generateFrameNumbers('perso_saut', { start: 13, end: 8 }),
+                    frameRate: 6,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'climbG',
+                    frames: this.anims.generateFrameNumbers('perso', { start: 11, end: 8 }),
+                    frameRate: 6,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'climbD',
+                    frames: this.anims.generateFrameNumbers('perso', { start: 4, end: 7 }),
+                    frameRate: 6,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'accroG',
+                    frames: [{ key: 'perso', frame :11}],
+                    frameRate: 5,
+                });
+                this.anims.create({
+                    key: 'accroD',
+                    frames: [{ key: 'perso', frame :4}],
+                    frameRate: 5,
+                })
+                this.anims.create({
+                    key: 'att1G',
+                    frames: this.anims.generateFrameNumbers('perso_att', { start: 11, end: 9 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'att1D',
+                    frames: this.anims.generateFrameNumbers('perso_att', { start: 0, end: 2 }),
+                    frameRate: 5,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'att2G',
+                    frames: this.anims.generateFrameNumbers('perso_att', { start: 8, end: 6 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'att2D',
+                    frames: this.anims.generateFrameNumbers('perso_att', { start: 3, end: 5 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'piqueG',
+                    frames: [{ key: 'perso_attd', frame :1}],
+                    frameRate: 5,
+
+                });
+                this.anims.create({
+                    key: 'piqueD',
+                    frames: [{ key: 'perso_attd', frame :0}],
+                    frameRate: 5,
+
+                });
+                this.anims.create({
+                    key: 'plante',
+                    frames: this.anims.generateFrameNumbers('vine', { start: 0, end: 10}),
+                    frameRate: 12,
+                    repeat: 0
+
+                });
+                this.anims.create({
+                    key: 'livre',
+                    frames: this.anims.generateFrameNumbers('check', { start: 0, end: 3}),
+                    frameRate: 5,
+                    repeat: -1
+
+                });
+                this.anims.create({
+                    key: 'oursG',
+                    frames: this.anims.generateFrameNumbers('ours', { start: 0, end: 1 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+
+                this.anims.create({
+                    key: 'oursD',
+                    frames: this.anims.generateFrameNumbers('ours', { start: 2, end: 3 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'nainG',
+                    frames: this.anims.generateFrameNumbers('nain', { start: 0, end: 3 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'nainD',
+                    frames: this.anims.generateFrameNumbers('nain', { start: 4, end: 7 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'geantG',
+                    frames: this.anims.generateFrameNumbers('geant', { start: 0, end: 3}),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'frogG',
+                    frames: this.anims.generateFrameNumbers('frog', { start: 0, end: 1 }),
+                    frameRate: 2,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'frogD',
+                    frames: this.anims.generateFrameNumbers('frog', { start: 2, end: 3 }),
+                    frameRate: 2,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'epiceG',
+                    frames: this.anims.generateFrameNumbers('epice', { start: 0, end: 1 }),
+                    frameRate: 5,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'epiceD',
+                    frames: this.anims.generateFrameNumbers('epice', { start: 2, end: 3 }),
+                    frameRate: 5,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'witchG',
+                    frames: this.anims.generateFrameNumbers('witch', { start: 0, end: 3 }),
+                    frameRate: 5,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'witchD',
+                    frames: this.anims.generateFrameNumbers('witch', { start: 4, end: 7 }),
+                    frameRate: 5,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'magic',
+                    frames: this.anims.generateFrameNumbers('magie', { start: 0, end: 1 }),
+                    frameRate: 5,
+                    repeat: -1
+                });
+            }
+
+
+
+            update() {
+                
+                console.log(player.x)
+                console.log(player.y)
+                console.log(equipe)
+                console.log(magieprete)
+                console.log(bossVulnerable)
+
+                this.majLife()
+                this.ouvrePorte()
+
+                if (boss_vaincu==2){
+                    magie.disableBody(true,true)
+                }
+                
+                
+
+                if (cursors.space.isDown&& texteDit==true){
+                    text.setVisible(false)
+                    textbox.setVisible(false)
+                    texteDit=false
+                }
+
+                checkpoint.getChildren().forEach(check => {
+                    check.anims.play('livre',true)
+                })
+
+                if (vie==0){
+                    this.mort(player)
+                }
+
+                
+                // IA Ennemis
+
+                enemies.getChildren().forEach(enemy => {
+                if (enemy.type=='frog'){
+                    enemy.setSize(32,32)
+                }
+                if (enemy.type=="ours" || enemy.type=="nain" || enemy.type=="bird" ||enemy.type=="epice"){
+                    if (enemy.x<=enemy.origin){
+                        enemy.anims.play(enemy.type+'D', true);
+                        enemy.setVelocityX(150)
+                    }
+                    else if (enemy.x>enemy.origin+192){
+                        enemy.anims.play(enemy.type+'G', true);
+                        enemy.setVelocityX(-150)
+                    }
+                }
+                if (enemy.type=="frog" && enemy.body.blocked.down){
+                   
+                        enemy.setVelocityY(-450)
+                    if (enemy.x<=enemy.origin+100){
+                        enemy.setVelocityX(100)
+                        enemy.anims.play(enemy.type+'D', true);
+                    }
+                    else if (enemy.x>enemy.origin+199){
+                        enemy.setVelocityX(-100)
+                        enemy.anims.play(enemy.type+'G', true);
+                }
+                    
+                    }})
+
+                    magie.anims.play('magic',true)
+
+                    if (player.x<boss.x){
+                        boss.setVelocityX(-50)
+                        boss.anims.play('witchG',true)
+                        magie.x=boss.x-32
+                        magie.y=boss.y
+                    }
+                    if (player.x>boss.x){
+                        boss.setVelocityX(50)
+                        boss.anims.play('witchD',true)
+                        magie.x=boss.x+32
+                        magie.y=boss.y
+                        
+                    }
+                    
+                
+
+                // UI
+                if (ctrl.isDown&& grappin_possede==true){
+                    ctrl.reset()
+                    if (equipe=="epee"){
+                        equipe="grappin"
+                    }
+                    else if (equipe=="grappin"){
+                        equipe="epee"  
+                    }
+                }
+
+                if (equipe=="epee"){
+                        afficheEpee.setVisible(true)
+                        afficheGrappin.setVisible(false)
+                        this.cameras.main.setZoom(1.5)
+                        ui.x=250
+                        ui.y=110
+                        ui.setScale(.7)
+                        ui2.x=380
+                        ui2.y=110
+                        ui2.setScale(.7)
+                        afficheVie.x=220
+                        afficheVie.y=110
+                        afficheVie.setScale(1)
+                        afficheVie2.x=315
+                        afficheVie2.y=100
+                        afficheVie2.setScale(.6)
+                        objet1.x=300
+                        objet1.y=120
+                        objet1.setScale(.7)
+                        objet2.x=330
+                        objet2.y=117
+                        objet2.setScale(.6)
+                        
+                    }
+                    else if (equipe=="grappin"){
+                        afficheEpee.setVisible(false)
+                        afficheGrappin.setVisible(true)
+                        this.cameras.main.setZoom(1)
+                        ui.x=150
+                        ui.y=50
+                        ui.setScale(1)
+                        ui2.x=340
+                        ui2.y=50
+                        ui2.setScale(1)
+                        afficheVie.x=103
+                        afficheVie.y=50
+                        afficheVie.setScale(1.4)
+                        afficheVie2.x=240
+                        afficheVie2.y=40
+                        afficheVie2.setScale(.9)
+                        objet1.x=220
+                        objet1.y=65
+                        objet1.setScale(1)
+                        objet2.x=260
+                        objet2.y=62
+                        objet2.setScale(.7)
+                        afficheGrappin.x=350
+                        afficheGrappin.y=45
+                        afficheGrappin.setScale(1.3)
+                    }
+                if (haricot_possede==true){
+                    objet1.setVisible(true)
+                }
+                if (grappin_possede==true){
+                    objet2.setVisible(true)
+                }
+
+                
+                
+                //Haricot
+
+                haricot.getChildren().forEach(haric => {
+                if (haric.la==true) {
+                    this.physics.add.collider(player,haric,this.accroche)
+                }})
+
+                finHaricot.getChildren().forEach(finHaric => {
+                    if (accroche==true){
+                        finHaric.setSize(96,32)
+                    }})
+
+                //if (accroche==false){
+                    //player.setSize(32,64)
+                    //player.setOffset(32,64)
+                //}
+
+                if(accroche==true){
+                    
+                    truc=true
+                    player.body.setAllowGravity(false)
+                    
+                    
+                    if (cursors.space.isDown){
+                        player.body.setAllowGravity(true)
+                        player.setVelocityY(-425)
+                        if (sens=="gauche"){
+                            player.anims.play("upD",true)
+                        }
+                        if (sens=="droite"){
+                            player.anims.play("upG",true)
+                        }
+                        saut=true
+
+                        finHaricot.getChildren().forEach(finHaric => {
+                    if(saut==true ){
+                        finHaric.setOffset(-5000,0)
+                    }
+                })
+
+                        accroche=false
+                        setTimeout(() => {
+                        truc=false
+                    },300);  
+
+                    }
+                    if (cursors.down.isDown) {
+                    if (sens=="gauche"){
+                            player.anims.play("climbG",true)
+                    }
+                    if (sens=="droite"){
+                        player.anims.play("climbD",true)
+                    }
+                    player.setVelocityY(250);
+                    }
+
+                    else if(cursors.left.isDown && sens=='gauche'){
+                        player.x=player.x-64
+                        sens='droite'
+                    }
+
+                    else if(cursors.right.isDown && sens=='droite'){
+                        player.x=player.x+64
+                        sens='gauche'
+                    }
+
+                    else if (cursors.up.isDown) {
+                        if (sens=="gauche"){
+                            player.anims.play("climbG",true)
+                    }
+                    if (sens=="droite"){
+                        player.anims.play("climbD",true)
+                    } 
+                        player.setVelocityY(-250);
+                    }
+
+                    else if (accroche==true){
+                        player.setVelocityY(0);
+                        if (sens=="gauche" ){
+                        player.anims.play("accroG",true)
+                    }
+                    if (sens=="droite"){
+                        player.anims.play("accroD",true)
+                    }
+                                    }
+                                }
+
+                if(cursors.shift.isDown && haricot_possede==true){
+                    plante=true
+                    setTimeout(() => {
+                        plante=false
+                    },300); }
+                
+
+                //Deplacement
+
+                if (cursors.left.isDown && accroche==false && texteDit==false) { //si la touche gauche est appuyée
+                    if (saut==false){
+                    player.anims.play('left', true);}
+                    sens= 'gauche'
+                    if (saut==false){
+                    player.setVelocityX(-250); //alors vitesse négative en X
+                    }
+                    if (saut==true){
+                    player.setVelocityX(-200); //alors vitesse négative en X
+                    }
+                    
+                }
+                else if (cursors.right.isDown && accroche==false&& texteDit==false) { //sinon si la touche droite est appuyée
+                    if (saut==false){
+                    player.anims.play('right', true);}
+                    sens= 'droite'
+                    if (saut==false){
+                    player.setVelocityX(250); //alors vitesse négative en X
+                    }
+                    if (saut==true){
+                    player.setVelocityX(200); //alors vitesse négative en X
+                    }
+                }
+
+                else { // sinon
+                    if (saut==false&&attack==false&&accroche==false){
+                    player.setVelocityX(0); //vitesse nulle
+                    if(sens=="gauche"){
+                    player.anims.play('turnG', true)
+                    };
+                    if(sens=="droite"){
+                    player.anims.play('turnD', true)
+                    }}
+                }
+
+                if (cursors.up.isDown && player.body.blocked.down && saut==false && equipe=="epee"&& texteDit==false) {
+                    saut = true
+                    player.setVelocityY(-425);
+                    if(sens=="gauche"){
+                    player.anims.play('upG', true)
+                    };
+                    if(sens=="droite"){
+                    player.anims.play('upD', true)
+                    }
+                }
+                
+                else if  (player.body.blocked.down){
+                    saut=false
+                }
+
+                if(saut==true){
+                    player.setOffset(0,6)
+                }
+                else if(saut==false){
+                    player.setOffset(0,0)
+                }
+
+                //Attaque 
+
+                if (cursors.space.isDown && sens=='droite' && saut == false && accroche==false && truc==false && equipe=="epee" && player.body.blocked.down){
+                    if (deja_att%2==0){
+                        player.anims.play('att1D', true)
+                    }
+                    else if(deja_att%2!=0){
+                        player.anims.play('att2D',true)
+                    }
+                    player.setVelocityX(20)
+                    player.setSize(80,75)
+                    player.setOffset(16,0)
+                    attack=true
+                    actd=true
+                    cursors.right.reset();
+                    cursors.left.reset();
+                    cursors.up.reset();
+                    cursors.down.reset();
+                    cursors.space.reset();
+                    this.input.keyboard.enabled = false;
+
+                    setTimeout(() => {
+                        deja_att+=1
+                        player.setSize(32,64)
+                        attack=false
+                        actd=false
+                        this.input.keyboard.enabled = true;
+                    },300);  
+                }
+                else if (cursors.space.isDown && sens=='gauche' && saut == false&& accroche==false&& truc==false && equipe=="epee" && player.body.blocked.down){
+                    if (deja_att%2==0){
+                        player.anims.play('att1G', true)
+                    }
+                    else if(deja_att%2!=0){
+                        player.anims.play('att2G',true)
+                    }
+                    player.setVelocityX(-20)
+                    player.setSize(80,75)
+                    player.setOffset(0,0)
+                    attack=true
+                    actg=true
+                    cursors.right.reset();
+                    cursors.left.reset();
+                    cursors.up.reset();
+                    cursors.down.reset();
+                    cursors.space.reset();
+                    this.input.keyboard.enabled = false;
+
+                    setTimeout(() => {
+                        deja_att+=1
+                        player.setSize(32,64)
+                        attack=false
+                        actg=false
+                        this.input.keyboard.enabled = true;
+                    },300); }
+
+                if (cursors.space.isDown && sens=='droite' && saut==true&& accroche==false&& truc==false && equipe=="epee"){
+                player.anims.play('piqueD', true)
+                pique=true
+                player.setSize(32,128)
+                player.setOffset(0,0)
+                attack=true
+                this.attack
+                actd=true
+                player.setVelocityX(0)
+                player.setVelocityY(500)
+                cursors.right.reset();
+                cursors.left.reset();
+                cursors.up.reset();
+                cursors.down.reset();
+                cursors.space.reset()
+                this.input.keyboard.enabled = false;
+
+                  
+            }
+            if (cursors.space.isDown && sens=='gauche' && saut==true&& accroche==false&& truc==false && equipe=="epee"){
+                player.anims.play('piqueG', true)
+                pique=true
+                player.setSize(32,128)
+                player.setOffset(0,0)
+                attack=true
+                this.attack
+                actd=true
+                player.setVelocityX(0)
+                player.setVelocityY(500)
+                cursors.right.reset();
+                cursors.left.reset();
+                cursors.up.reset();
+                cursors.down.reset();
+                cursors.space.reset()
+                this.input.keyboard.enabled = false; 
+            }
+
+            if (player.body.blocked.down && pique==true){
+                    player.setSize(32,64)
+                    pique=false
+                    attack=false
+                    actg=false
+                    actd=false
+                    this.input.keyboard.enabled = true;
+                }
+                
+
+                //Changement scene
+                if (life==0) {
+
+                    this.scene.start('GameOver');
+                }
+                if(player.x==624 && player.y==256){
+                    posx=2224
+                    posy=1472
+                    this.scene.start('Marais',{ vie:vie, life:life });
+                }
+            
+
+        }
+            //Fonctions
+
+        attack(player,enemies){
+        if (attack==true){
+        enemies.disableBody(true, true);
+        }
+        }
+
+        haricot(player,haricot){
+            if(plante==true && player.body.velocity.x==0){
+                haricot.anims.play("plante",true)
+                setTimeout(() => {
+                    haricot.la=true
+                },300);
+                if (sens=='droite'){
+                    player.x-=32
+                }
+                else if (sens=='gauche'){
+                    player.x+=32
+                }
+            }
+        }
+
+        accroche(player,haricot){
+            accroche=true
+            saut=false
+            cursors.right.reset()
+            cursors.left.reset()
+            //player.setOffset(32,0)
+            //player.setSize(2,64)
+            
+        }
+
+        grapple(grappin,prise){
+            if(grappinActive==true){
+                player.x=prise.x
+                grappin.setVelocityX(0)
+                grappin.setVisible(false)
+                grappAccroch=true
+                grappinActive=false
+                setTimeout(() => {
+                    grappAccroch=false
+                },300);      
+            }
+            if (grappinActiveHaut==true){
+                player.setVelocityY(-750)
+                grappin.setVelocityX(0)
+                grappin.setVisible(false)
+                grappAccroch=true
+                grappinActiveHaut=false
+                setTimeout(() => {
+                    grappAccroch=false
+                },300); 
+            }
+
+        }
+        hitEnemy (player, enemies) {
+                if (pique==true){
+                    if (bossVulnerable==true){
+                        bossVulnerable=false
+                        player.setVelocityY(-425)
+                        bossLife-=1
+                        enemies.setTint(0xff0000)
+
+                        setTimeout(()=> {
+                        enemies.setTint(0xffffff)
+                        bossVulnerable=true
+                        },1000)
+                        if (bossLife==0){
+                        enemies.disableBody(true,true)
+                        boss_vaincu+=1
+                        bossVulnerable=true
+                    }}
+                    
+                }
+                if (attack==false){
+                    if (vulnerable==true){
+                vie-=1
+                vulnerable=false
+                player.setTint(0xff0000)
+                if (sens=="gauche"){
+                    player.setVelocityX(250)
+                }
+                if (sens=="droite"){
+                    player.setVelocityX(-250)
+                }
+                setTimeout(()=> {
+                    player.setTint(0xffffff)
+                    vulnerable=true
+                },1000)
+                
+                }
+                }
+            }
+
+            hitBoss(){
+                if (bossLife>0){
+                    if (bossVulnerable==true){
+                    bossLife-=1
+                    bossVulnerable=false
+                    boss.setVelocityX(0)
+                    boss.setVelocityY(0)
+                    boss.setTint(0xff0000)
+                    setTimeout(()=>{
+                        boss.setTint(0xffffff)
+                        bossVulnerable=true
+                    },1000)
+                    
+                    }
+                }
+                else{
+                    boss.disableBody(true,true)
+                    boss_vaincu+=1
+                }
+            }
+            AfficheText(player,pnj){
+                textbox.setVisible(true)
+                text.setVisible(true)
+                texteDit=true
+                grappin_possede=true
+                if (cursors.space.isDown){
+                    texteDit=false
+                    pnj.disableBody(true,true)
+                    textbox.setVisible(false)
+                    text.setVisible(false)
+                }
+            }
+
+            check(player,checkpoint){
+                posx=checkpoint.x
+                posy=checkpoint.y
+            }
+            mort(player){
+                if (life>0){
+                player.x=posx
+                player.y=posy
+                vie-=1
+                }
+                if (vie<=0){
+                    vie=4
+                    life-=1   
+                }
+            }
+
+            majLife(){
+                if (vie==4){
+                afficheVie.setFrame(0)
+                }
+                if (vie==3){
+                afficheVie.setFrame(1)
+                }
+                if (vie==2){
+                afficheVie.setFrame(2)
+                }
+                if (vie==1){
+                afficheVie.setFrame(3)
+                }
+                if (vie==0){
+                afficheVie.setFrame(4)
+                }
+                if (life==3){
+                    afficheVie2.setFrame(0)
+                }
+                if (life==2){
+                    afficheVie2.setFrame(1)
+                }
+                if (life==1){
+                    afficheVie2.setFrame(2)
+                }
+                if (life==0){
+                    afficheVie2.setFrame(3)
+                }
+            }
+            ouvrePorte(porte){
+                if (boss_vaincu==2){
+                porte1.disableBody(true,true)
+                porte2.disableBody(true,true)
+                
+                }
+            }
+
+        }
+
+        class Tour extends Phaser.Scene {
+            constructor() {
+                super("Tour");
+            }
+
+            preload() {
+                this.load.image('soin','assets/panier.png')
+                this.load.spritesheet('perso','assets/Red_Move.png',
+                    {frameWidth:32, frameHeight:64 });
+                this.load.spritesheet('perso_att','assets/Red_Attack_2.png',
+                    {frameWidth:96, frameHeight:86 });
+                this.load.spritesheet('perso_marche','assets/Red_Walk.png',
+                    {frameWidth:34, frameHeight:64 });
+                this.load.spritesheet('perso_saut','assets/Red_Jump_2.png',
+                    {frameWidth:32, frameHeight:70 });
+                this.load.spritesheet('perso_attd','assets/Red_AttackDown.png',
+                    {frameWidth:33, frameHeight:124 });
+                this.load.spritesheet('perso','assets/Red_Move.png',
+                    {frameWidth:32, frameHeight:64 });
+                this.load.spritesheet('vine','assets/vine.png',
+                    {frameWidth:32, frameHeight:320 });
+                this.load.image('finHar','assets/fin_haricot.png')
+                this.load.image('bout','assets/bout_vine.png')
+
+                this.load.image('priseD1','assets/PriseD1.png')
+                this.load.image('priseG1','assets/PriseG1.png')
+                this.load.image('priseD2','assets/PriseD2.png')
+                this.load.image('priseG2','assets/PriseG2.png')
+                this.load.image('priseHautC','assets/Crochet.png')
+                this.load.image('priseMurC','assets/CrochetMur.png')
+                this.load.spritesheet('grappin','assets/grap.png',
+                    {frameWidth:32, frameHeight:32})
+                this.load.spritesheet('perso_grap','assets/Red_Grapside.png',
+                    {frameWidth:896, frameHeight:64})
+                this.load.spritesheet('perso_grapUp','assets/Red_GrapUp2.png',
+                    {frameWidth:32, frameHeight:446})
+
+                this.load.spritesheet('bird','assets/Crow.png',
+                    {frameWidth:64, frameHeight:32 });
+                this.load.spritesheet('wolf','assets/Wolf_Iddle.png',
+                    {frameWidth:38, frameHeight:64})
+                this.load.spritesheet('wolfBlow','assets/Wolf_Blow.png',
+                    {frameWidth:64, frameHeight:64})
+                this.load.spritesheet('vent','assets/Wind.png',
+                    {frameWidth:96, frameHeight:64})
+
+
+                this.load.spritesheet('check','assets/Checkpoint.png',
+                    {frameWidth:32, frameHeight:32 })
+                this.load.image('UI','assets/UI.png')
+                this.load.image('UI2','assets/UI2.png')
+                this.load.spritesheet('coeur','assets/coeur.png',
+                    {frameWidth:128, frameHeight:32 })
+                this.load.spritesheet('vie','assets/Life.png',
+                    {frameWidth:96, frameHeight:25 })
+                this.load.image('epee','assets/sword.png')
+                this.load.image('Equipgrappin','assets/grappin.png')
+                this.load.image('haricUI','assets/haricot.png')
+                
+
+
+                this.load.image("Phaser_tuilesdejeu", "assets/Niveau/Placeholder_Tileset.png");
+                this.load.image("Fond","assets/Niveau/Niveau_Tour_Fond.png")
+                this.load.image("Branches","assets/Niveau/Niveau_Tour_Terre.png")
+
+                // chargement de la carte
+                this.load.tilemapTiledJSON("carte3", "assets/Niveau/Niveau_Tour.json"); 
+
+            }
+
+
+
+            create() {
+
+
+                enemies =this.physics.add.group({
+                    setCollideWorldBounds : true,
+                    origin:0,
+                    type:"Toto"
+                })
+
+                meuble= this.physics.add.group({
+                    immovable:true,
+                    allowGravity : false,
+                })
+
+                haricot= this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true,
+                    la:false
+                    
+                })
+
+                finHaricot= this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true,
+                })
+
+                bout=this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true,
+                })
+
+                prise=this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true
+                })
+                checkpoint=this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true
+                })
+                vide= this.physics.add.group({
+                    allowGravity:false,
+                    immovable:true
+                })
+                vent= this.physics.add.group({
+                    immovable:true,
+                    la:false
+                })
+
+                cursors = this.input.keyboard.createCursorKeys();
+
+
+                const carteDuNiveau = this.add.tilemap("carte3");
+
+                // chargement du jeu de tuiles
+                const tileset = carteDuNiveau.addTilesetImage(
+                        "Placeholder_Tileset",
+                        "Phaser_tuilesdejeu"
+                        );  ;
+
+                
+                const calque_ciel = carteDuNiveau.createLayer(
+                        "Ciel",
+                        tileset
+                        );
+
+                this.add.image(2080, 1600, 'Fond');
+
+                // chargement du calque calque_background
+                const calque_background = carteDuNiveau.createLayer(
+                        "Background",
+                        tileset
+                        );
+
+                const calque_crochet = carteDuNiveau.createLayer(
+                        "Crochet",
+                        tileset
+                        );
+            
+
+                // chargement du calque calque_plateformes
+                const calque_plateformes = carteDuNiveau.createLayer(
+                        "Niveau",
+                        tileset
+                        );
+
+                this.add.image(2080, 1600, 'Branches');
+                
+
+                calque_plateformes.setCollisionByProperty({ estSolide: true }); 
+
+                var har1=haricot.create(976,3024-144,'vine')
+                var har2=haricot.create(1872,2608-144,'vine')
+                var har3=haricot.create(1328,1744-144,'vine')
+                var har4=haricot.create(1232,656-144,'vine')
+                var har5=haricot.create(1680,368-144,'vine')
+                
+
+                var finHar1=finHaricot.create(976,3024-320,'finHar')
+                var finHar2=finHaricot.create(1872,2608-320,'finHar')
+                var finHar3=finHaricot.create(1328,1744-320,'finHar')
+                var finHar4=finHaricot.create(1232,656-320,'finHar')
+                var finHar5=finHaricot.create(1680,368-320,'finHar')
+                
+                finHaricot.setVisible(false)
+
+                var boutHar1=bout.create(976,3024-288,'bout')
+                var boutHar2=bout.create(1872,2608-288,'bout')
+                var boutHar3=bout.create(1328,1744-288,'bout')
+                var boutHar4=bout.create(1232,656-288,'bout')
+                var boutHar5=bout.create(1680,368-288,'bout')
+                
+                bout.setVisible(false)
+                bout.getChildren().forEach(b => {
+                    b.setSize(30,32)
+                })
+
+                var pris1=prise.create(336,3024,'priseG1')
+                var pris2=prise.create(720,3024,'priseD1')
+                var pris3=prise.create(1488,2000,'priseG1')
+                var pris4=prise.create(1872,2000,'priseD1')
+                var pris5=prise.create(1488,2224,'priseHautC')
+                var pris6=prise.create(1328,1232,'priseHautC')
+                var pris7=prise.create(2000,944,'priseHautC')
+                var pris8=prise.create(1968,1072,'priseG1')
+                var pris9=prise.create(1200,2128,'priseMurC')
+                
+                var check1=checkpoint.create(1792,2240,'check')
+                var check2=checkpoint.create(1536,1216,'check')
+                var check3=checkpoint.create(1024,352,'check')
+
+                boss=this.physics.add.sprite(1680,352,'wolf')
+                boss.body.immovable=true
+                bossLife=3
+
+                grappin= this.physics.add.sprite(40,100,'grappin')
+                grappin.setVisible(false)
+                grappin.body.setAllowGravity(false)
+
+                soin=this.physics.add.sprite(976,352,'soin')
+
+                player = this.physics.add.sprite(posx,posy, 'perso');
+                player.setCollideWorldBounds(true);
+                
+                vent1=vent.create(1776,288,'vent')
+                vent.setVisible(false)
+                
+                var trou1=vide.create(2448,1424,'bout')
+                trou1.setSize(1088,32)
+                var trou2=vide.create(560,560,'bout')
+                trou2.setSize(1088,32)
+                var trou3=vide.create(610,3184,'bout')
+                trou3.setSize(448,32)
+                vide.setVisible(false)
+                
+                
+
+                var enemy1=enemies.create(784,2960,'bird')
+                enemy1.type='bird'
+                var enemy2=enemies.create(1328,2544,'bird')
+                enemy2.type='bird'
+                var enemy3=enemies.create(1584,2544,'bird')
+                enemy3.type='bird'
+                var enemy4=enemies.create(1488,2256,'bird')
+                enemy4.type='bird'
+                var enemy5=enemies.create(1584,1268,'bird')
+                enemy5.type='bird'
+                
+                enemies.getChildren().forEach(enemy => {
+                    enemy.origin=enemy.x
+                })
+
+
+                ui=this.physics.add.sprite(250,110,'UI').setScrollFactor(0);//345
+                ui.setScale(.7)
+                ui.body.setAllowGravity(false)
+                ui2=this.physics.add.sprite(380,110,'UI2').setScrollFactor(0)
+                ui2.setScale(.7)
+                ui2.body.setAllowGravity(false)
+                afficheEpee=this.physics.add.sprite(380,110,'epee').setScrollFactor(0)
+                afficheEpee.body.setAllowGravity(false)
+                afficheEpee.setVisible(false)
+                afficheGrappin=this.physics.add.sprite(380,110,'Equipgrappin').setScrollFactor(0)
+                afficheGrappin.body.setAllowGravity(false)
+                afficheGrappin.setScale(.7)
+                afficheGrappin.setVisible(false)
+                afficheVie=this.physics.add.sprite(220,110,'coeur').setScrollFactor(0);
+                afficheVie.body.setAllowGravity(false)
+                afficheVie2=this.physics.add.sprite(315,100,'vie').setScrollFactor(0);
+                afficheVie2.body.setAllowGravity(false)
+                afficheVie2.setScale(.6)
+                objet1=this.physics.add.sprite(300,120,'haricUI').setScrollFactor(0);
+                objet1.body.setAllowGravity(false)
+                objet1.setScale(.7)
+                objet1.setVisible(false)
+                objet2=this.physics.add.sprite(330,117,'Equipgrappin').setScrollFactor(0);
+                objet2.body.setAllowGravity(false)
+                objet2.setScale(.6)
+                objet2.setVisible(false)
+
+
+                this.physics.add.collider(player, calque_plateformes);
+                this.physics.add.collider(boss, calque_plateformes);
+                this.physics.add.collider(vent, calque_plateformes);
+                this.physics.add.collider(soin, calque_plateformes);
+                this.physics.add.collider(player,finHaricot)
+                this.physics.add.collider(player,bout)
+                this.physics.add.collider(player, enemies, this.hitEnemy);
+                this.physics.add.collider(player,boss, this.piqueBoss)
+                this.physics.add.collider(player,pnj,this.AfficheText)
+                this.physics.add.collider(player,vide,this.mort)
+                
+                this.physics.add.collider(enemies,calque_plateformes);
+                this.physics.add.collider(grappin,prise,this.grapple)
+
+
+                this.physics.add.overlap(player, enemies,this.attack)
+                this.physics.add.overlap(player, boss, this.hitBoss)
+                this.physics.add.overlap(player,haricot,this.haricot)
+                this.physics.add.overlap(player,checkpoint,this.check)
+                this.physics.add.overlap(player,vent,this.wind)
+                this.physics.add.overlap(player,soin,this.heal)
+                
+
+
+                // redimentionnement du monde avec les dimensions calculées via tiled
+                this.physics.world.setBounds(0, 0, 4160, 3200);
+                //  ajout du champs de la caméra de taille identique à celle du monde
+                this.cameras.main.setBounds(0, 0, 4160, 3200);
+                // ancrage de la caméra sur le joueur
+                this.cameras.main.startFollow(player);
+                this.cameras.main.setZoom(0.5);
+                
+
+                ctrl= this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL);
+
+
+                //Animations
+                this.anims.create({
+                    key: 'left',
+                    frames: this.anims.generateFrameNumbers('perso_marche', { start: 4, end: 7 }),
+                    frameRate: 10,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'turnD',
+                    frames: this.anims.generateFrameNumbers('perso', { start: 0, end: 3 }),
+                    frameRate: 4,
+                    repeat:-1
+                });
+                this.anims.create({
+                    key: 'turnG',
+                    frames: this.anims.generateFrameNumbers('perso', { start: 15, end: 12 }),
+                    frameRate: 4,
+                    repeat:-1
+                });
+                this.anims.create({
+                    key: 'right',
+                    frames: this.anims.generateFrameNumbers('perso_marche', { start: 0, end: 3 }),
+                    frameRate: 10,
+                    repeat: -1
+                    
+                });
+                this.anims.create({
+                    key: 'upD',
+                    frames: this.anims.generateFrameNumbers('perso_saut', { start: 1, end: 5 }),
+                    frameRate: 6,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'upG',
+                    frames: this.anims.generateFrameNumbers('perso_saut', { start: 13, end: 8 }),
+                    frameRate: 6,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'climbG',
+                    frames: this.anims.generateFrameNumbers('perso', { start: 11, end: 8 }),
+                    frameRate: 6,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'climbD',
+                    frames: this.anims.generateFrameNumbers('perso', { start: 4, end: 7 }),
+                    frameRate: 6,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'accroG',
+                    frames: [{ key: 'perso', frame :11}],
+                    frameRate: 5,
+                });
+                this.anims.create({
+                    key: 'accroD',
+                    frames: [{ key: 'perso', frame :4}],
+                    frameRate: 5,
+                })
+                this.anims.create({
+                    key: 'att1G',
+                    frames: this.anims.generateFrameNumbers('perso_att', { start: 11, end: 9 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'att1D',
+                    frames: this.anims.generateFrameNumbers('perso_att', { start: 0, end: 2 }),
+                    frameRate: 5,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'att2G',
+                    frames: this.anims.generateFrameNumbers('perso_att', { start: 8, end: 6 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'att2D',
+                    frames: this.anims.generateFrameNumbers('perso_att', { start: 3, end: 5 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'piqueG',
+                    frames: [{ key: 'perso_attd', frame :1}],
+                    frameRate: 5,
+
+                });
+                this.anims.create({
+                    key: 'piqueD',
+                    frames: [{ key: 'perso_attd', frame :0}],
+                    frameRate: 5,
+
+                });
+                this.anims.create({
+                    key: 'plante',
+                    frames: this.anims.generateFrameNumbers('vine', { start: 0, end: 10}),
+                    frameRate: 12,
+                    repeat: 0
+
+                });
+                this.anims.create({
+                    key: 'grapD',
+                    frames: this.anims.generateFrameNumbers('perso_grap', { start: 0, end: 11}),
+                    frameRate: 12,
+                    repeat: -1
+
+                });
+                this.anims.create({
+                    key: 'grapG',
+                    frames: this.anims.generateFrameNumbers('perso_grap', { start: 12, end: 23}),
+                    frameRate: 12,
+                    repeat: -1
+
+                });
+                this.anims.create({
+                    key: 'grapUD',
+                    frames: this.anims.generateFrameNumbers('perso_grapUp', { start: 0, end: 4}),
+                    frameRate: 12,
+                    repeat: -1
+
+                });
+                this.anims.create({
+                    key: 'grapUG',
+                    frames: this.anims.generateFrameNumbers('perso_grapUp', { start: 9, end: 5}),
+                    frameRate: 12,
+                    repeat: -1
+
+                });
+                this.anims.create({
+                    key: 'livre',
+                    frames: this.anims.generateFrameNumbers('check', { start: 0, end: 3}),
+                    frameRate: 5,
+                    repeat: -1
+
+                });
+                this.anims.create({
+                    key: 'oursG',
+                    frames: this.anims.generateFrameNumbers('ours', { start: 0, end: 1 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+
+                this.anims.create({
+                    key: 'oursD',
+                    frames: this.anims.generateFrameNumbers('ours', { start: 2, end: 3 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'nainG',
+                    frames: this.anims.generateFrameNumbers('nain', { start: 0, end: 3 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'nainD',
+                    frames: this.anims.generateFrameNumbers('nain', { start: 4, end: 7 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'geantG',
+                    frames: this.anims.generateFrameNumbers('geant', { start: 0, end: 3}),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'frogG',
+                    frames: this.anims.generateFrameNumbers('frog', { start: 0, end: 1 }),
+                    frameRate: 2,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'frogD',
+                    frames: this.anims.generateFrameNumbers('frog', { start: 2, end: 3 }),
+                    frameRate: 2,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'epiceG',
+                    frames: this.anims.generateFrameNumbers('epice', { start: 0, end: 1 }),
+                    frameRate: 5,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'epiceD',
+                    frames: this.anims.generateFrameNumbers('epice', { start: 2, end: 3 }),
+                    frameRate: 5,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'birdD',
+                    frames: this.anims.generateFrameNumbers('bird', { start: 0, end: 3 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'birdG',
+                    frames: this.anims.generateFrameNumbers('bird', { start: 4, end: 7 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'wolfG',
+                    frames: this.anims.generateFrameNumbers('wolf', { start: 4, end: 7 }),
+                    frameRate: 11,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'wolfD',
+                    frames: this.anims.generateFrameNumbers('wolf', { start: 0, end: 3 }),
+                    frameRate: 7,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'wolfBlow1',
+                    frames: this.anims.generateFrameNumbers('wolfBlow', { start: 3, end: 2 }),
+                    frameRate: 4,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'wind',
+                    frames: this.anims.generateFrameNumbers('vent', { start: 0, end: 4 }),
+                    frameRate: 8,
+                    repeat: -1
+                });
+            }
+
+
+
+            update() {
+                
+                console.log(player.x)
+                console.log(player.y)
+                console.log(equipe)
+                console.log(posx)
+                console.log(posy)
+                console.log(vent1.la)
+
+                this.majLife()
+                if (vent1.la==true&& boss_vaincu<3){
+                vent1.setVisible(true)
+                vent1.anims.play('wind',true)
+            }
+                
+
+                if (cursors.space.isDown&& texteDit==true){
+                    text.setVisible(false)
+                    textbox.setVisible(false)
+                    texteDit=false
+                }
+
+                checkpoint.getChildren().forEach(check => {
+                    check.anims.play('livre',true)
+                })
+
+                if (vie==0){
+                    this.mort(player)
+                }
+
+                
+                // IA Ennemis
+
+                enemies.getChildren().forEach(enemy => {
+                if (enemy.type=='frog'){
+                    enemy.setSize(32,32)
+                }
+                if (enemy.type=='bird'){
+                    enemy.body.setAllowGravity(false)
+                }
+                if (enemy.type=="ours" || enemy.type=="nain" || enemy.type=="bird" ||enemy.type=="epice"){
+                    if (enemy.x<=enemy.origin){
+                        enemy.anims.play(enemy.type+'D', true);
+                        enemy.setVelocityX(150)
+                    }
+                    else if (enemy.x>enemy.origin+192){
+                        enemy.anims.play(enemy.type+'G', true);
+                        enemy.setVelocityX(-150)
+                    }
+                }
+                if (enemy.type=="frog" && enemy.body.blocked.down){
+                    //setTimeout(() => {
+                        enemy.setVelocityY(-450)
+                    if (enemy.x<=enemy.origin+100){
+                        enemy.setVelocityX(100)
+                        enemy.anims.play(enemy.type+'D', true);
+                    }
+                    else if (enemy.x>enemy.origin+199){
+                        enemy.setVelocityX(-100)
+                        enemy.anims.play(enemy.type+'G', true);
+                }
+                    //},1000); }
+                    }})
+
+                    if(player.x>=1376 &&player.y<=416){
+                        this.activeBoss(boss)
+                    }
+                
+
+                // UI
+                if (ctrl.isDown&& grappin_possede==true){
+                    ctrl.reset()
+                    if (equipe=="epee"){
+                        equipe="grappin"
+                    }
+                    else if (equipe=="grappin"){
+                        equipe="epee"  
+                    }
+                }
+
+                if (equipe=="epee"){
+                        afficheEpee.setVisible(true)
+                        afficheGrappin.setVisible(false)
+                        this.cameras.main.setZoom(1.5)
+                        ui.x=250
+                        ui.y=110
+                        ui.setScale(.7)
+                        ui2.x=380
+                        ui2.y=110
+                        ui2.setScale(.7)
+                        afficheVie.x=220
+                        afficheVie.y=110
+                        afficheVie.setScale(1)
+                        afficheVie2.x=315
+                        afficheVie2.y=100
+                        afficheVie2.setScale(.6)
+                        objet1.x=300
+                        objet1.y=120
+                        objet1.setScale(.7)
+                        objet2.x=330
+                        objet2.y=117
+                        objet2.setScale(.6)
+                        
+                    }
+                    else if (equipe=="grappin"){
+                        afficheEpee.setVisible(false)
+                        afficheGrappin.setVisible(true)
+                        this.cameras.main.setZoom(1)
+                        ui.x=150
+                        ui.y=50
+                        ui.setScale(1)
+                        ui2.x=340
+                        ui2.y=50
+                        ui2.setScale(1)
+                        afficheVie.x=103
+                        afficheVie.y=50
+                        afficheVie.setScale(1.4)
+                        afficheVie2.x=240
+                        afficheVie2.y=40
+                        afficheVie2.setScale(.9)
+                        objet1.x=220
+                        objet1.y=65
+                        objet1.setScale(1)
+                        objet2.x=260
+                        objet2.y=62
+                        objet2.setScale(.7)
+                        afficheGrappin.x=350
+                        afficheGrappin.y=45
+                        afficheGrappin.setScale(1.3)
+                    }
+                if (haricot_possede==true){
+                    objet1.setVisible(true)
+                }
+                if (grappin_possede==true){
+                    objet2.setVisible(true)
+                }
+
+                //Grappin
+                if (grappinActive==false && grappinActiveHaut==false){
+                    grappin.x=player.x
+                    grappin.y=player.y
+                }
+
+                if(cursors.space.isDown && sens=='droite'&& equipe=="grappin" && saut==false && cursors.up.isDown&& texteDit==false){
+                    grappinActiveHaut=true
+                    grappin.setFrame(1)
+                    grappin.setVisible(true)
+                    player.anims.play('grapUD',true)
+                    grappin.setVelocityY(-350)
+                    cursors.right.reset();
+                    cursors.left.reset();
+                    cursors.up.reset();
+                    cursors.down.reset();
+                    cursors.space.reset();
+                    ctrl.reset()
+                    this.input.keyboard.enabled = false;
+                }
+
+                if(cursors.space.isDown && sens=='gauche' && equipe=="grappin" && saut==false && cursors.up.isDown&& texteDit==false){
+                    grappinActiveHaut=true
+                    grappin.setFrame(1)
+                    grappin.setVisible(true)
+                    player.anims.play('grapUG',true)
+                    grappin.setVelocityY(-350)
+                    cursors.right.reset();
+                    cursors.left.reset();
+                    cursors.up.reset();
+                    cursors.down.reset();
+                    cursors.space.reset();
+                    ctrl.reset()
+                    this.input.keyboard.enabled = false;
+                }
+
+                if(cursors.space.isDown && equipe=="grappin" && saut==false){
+                    grappin.setFrame(0)
+                    grappinActive=true
+                    grappin.setVisible(true)
+                    if (sens=='droite'){
+                        player.anims.play('grapD',true)
+                        grappin.setVelocityX(350)
+                        cursors.right.reset();
+                        cursors.left.reset();
+                        cursors.up.reset();
+                        cursors.down.reset();
+                        cursors.space.reset();
+                        ctrl.reset()
+                        this.input.keyboard.enabled = false;
+                        
+                    }
+                    else if (sens=='gauche'){
+                        grappin.setFrame(3)
+                        player.anims.play('grapG',true)
+                        grappin.setVelocityX(-350)
+                        cursors.right.reset();
+                        cursors.left.reset();
+                        cursors.up.reset();
+                        cursors.down.reset();
+                        cursors.space.reset();
+                        ctrl.reset()
+                        this.input.keyboard.enabled = false;
+                        
+                    }}
+
+                if (grappin.x-player.x>=384 || player.x-grappin.x>=384 || grappAccroch==true || player.y-grappin.y>=160){
+                    grappin.setVelocityX(0)
+                    grappin.setVelocityY(0)
+                    grappinActiveHaut=false
+                    grappinActive=false
+                    grappin.setVisible(false)
+                    this.input.keyboard.enabled = true;
+                }
+                
+                //Haricot
+
+                haricot.getChildren().forEach(haric => {
+                if (haric.la==true) {
+                    this.physics.add.collider(player,haric,this.accroche)
+                }})
+
+                finHaricot.getChildren().forEach(finHaric => {
+                    if (accroche==true){
+                        finHaric.setSize(96,32)
+                    }})
+
+                //if (accroche==false){
+                    //player.setSize(32,64)
+                    //player.setOffset(32,64)
+                //}
+
+                if(accroche==true){
+                    
+                    truc=true
+                    player.body.setAllowGravity(false)
+                    
+                    
+                    if (cursors.space.isDown){
+                        player.body.setAllowGravity(true)
+                        player.setVelocityY(-425)
+                        if (sens=="gauche"){
+                            player.anims.play("upD",true)
+                        }
+                        if (sens=="droite"){
+                            player.anims.play("upG",true)
+                        }
+                        saut=true
+
+                        finHaricot.getChildren().forEach(finHaric => {
+                    if(saut==true ){
+                        finHaric.setOffset(-5000,0)
+                    }
+                })
+
+                        accroche=false
+                        setTimeout(() => {
+                        truc=false
+                    },300);  
+
+                    }
+                    if (cursors.down.isDown) {
+                    if (sens=="gauche"){
+                            player.anims.play("climbG",true)
+                    }
+                    if (sens=="droite"){
+                        player.anims.play("climbD",true)
+                    }
+                    player.setVelocityY(250);
+                    }
+
+                    else if(cursors.left.isDown && sens=='gauche'){
+                        player.x=player.x-64
+                        sens='droite'
+                    }
+
+                    else if(cursors.right.isDown && sens=='droite'){
+                        player.x=player.x+64
+                        sens='gauche'
+                    }
+
+                    else if (cursors.up.isDown) {
+                        if (sens=="gauche"){
+                            player.anims.play("climbG",true)
+                    }
+                    if (sens=="droite"){
+                        player.anims.play("climbD",true)
+                    } 
+                        player.setVelocityY(-250);
+                    }
+
+                    else if (accroche==true){
+                        player.setVelocityY(0);
+                        if (sens=="gauche" ){
+                        player.anims.play("accroG",true)
+                    }
+                    if (sens=="droite"){
+                        player.anims.play("accroD",true)
+                    }
+                                    }
+                                }
+
+                if(cursors.shift.isDown && haricot_possede==true){
+                    plante=true
+                    setTimeout(() => {
+                        plante=false
+                    },300); }
+                
+
+                //Deplacement
+
+                if (cursors.left.isDown && accroche==false && texteDit==false && pousse==false) { //si la touche gauche est appuyée
+                    if (saut==false){
+                    player.anims.play('left', true);}
+                    sens= 'gauche'
+                    if (saut==false){
+                    player.setVelocityX(-250); //alors vitesse négative en X
+                    }
+                    if (saut==true){
+                    player.setVelocityX(-200); //alors vitesse négative en X
+                    }
+                    
+                }
+                else if (cursors.right.isDown && accroche==false&& texteDit==false&& pousse==false) { //sinon si la touche droite est appuyée
+                    if (saut==false){
+                    player.anims.play('right', true);}
+                    sens= 'droite'
+                    if (saut==false){
+                    player.setVelocityX(250); //alors vitesse négative en X
+                    }
+                    if (saut==true){
+                    player.setVelocityX(200); //alors vitesse négative en X
+                    }
+                }
+
+                else { // sinon
+                    if (saut==false&&attack==false&&accroche==false&& pousse==false){
+                    player.setVelocityX(0); //vitesse nulle
+                    if(sens=="gauche"){
+                    player.anims.play('turnG', true)
+                    };
+                    if(sens=="droite"){
+                    player.anims.play('turnD', true)
+                    }}
+                }
+
+                if (cursors.up.isDown && player.body.blocked.down && saut==false && equipe=="epee"&& texteDit==false&& pousse==false) {
+                    saut = true
+                    player.setVelocityY(-425);
+                    if(sens=="gauche"){
+                    player.anims.play('upG', true)
+                    };
+                    if(sens=="droite"){
+                    player.anims.play('upD', true)
+                    }
+                }
+                
+                else if  (player.body.blocked.down){
+                    saut=false
+                }
+
+                if(saut==true){
+                    player.setOffset(0,6)
+                }
+                else if(saut==false){
+                    player.setOffset(0,0)
+                }
+
+                //Attaque 
+
+                if (cursors.space.isDown && sens=='droite' && saut == false && accroche==false && truc==false && equipe=="epee" && player.body.blocked.down){
+                    if (deja_att%2==0){
+                        player.anims.play('att1D', true)
+                    }
+                    else if(deja_att%2!=0){
+                        player.anims.play('att2D',true)
+                    }
+                    player.setVelocityX(20)
+                    player.setSize(80,75)
+                    player.setOffset(16,0)
+                    attack=true
+                    actd=true
+                    cursors.right.reset();
+                    cursors.left.reset();
+                    cursors.up.reset();
+                    cursors.down.reset();
+                    cursors.space.reset();
+                    this.input.keyboard.enabled = false;
+
+                    setTimeout(() => {
+                        deja_att+=1
+                        player.setSize(32,64)
+                        attack=false
+                        actd=false
+                        this.input.keyboard.enabled = true;
+                    },300);  
+                }
+                else if (cursors.space.isDown && sens=='gauche' && saut == false&& accroche==false&& truc==false && equipe=="epee" && player.body.blocked.down){
+                    if (deja_att%2==0){
+                        player.anims.play('att1G', true)
+                    }
+                    else if(deja_att%2!=0){
+                        player.anims.play('att2G',true)
+                    }
+                    player.setVelocityX(-20)
+                    player.setSize(80,75)
+                    player.setOffset(0,0)
+                    attack=true
+                    actg=true
+                    cursors.right.reset();
+                    cursors.left.reset();
+                    cursors.up.reset();
+                    cursors.down.reset();
+                    cursors.space.reset();
+                    this.input.keyboard.enabled = false;
+
+                    setTimeout(() => {
+                        deja_att+=1
+                        player.setSize(32,64)
+                        attack=false
+                        actg=false
+                        this.input.keyboard.enabled = true;
+                    },300); }
+
+                if (cursors.space.isDown && sens=='droite' && saut==true&& accroche==false&& truc==false && equipe=="epee"){
+                player.anims.play('piqueD', true)
+                pique=true
+                player.setSize(32,128)
+                player.setOffset(0,0)
+                attack=true
+                this.attack
+                actd=true
+                player.setVelocityX(0)
+                player.setVelocityY(500)
+                cursors.right.reset();
+                cursors.left.reset();
+                cursors.up.reset();
+                cursors.down.reset();
+                cursors.space.reset()
+                this.input.keyboard.enabled = false;
+
+                  
+            }
+            if (cursors.space.isDown && sens=='gauche' && saut==true&& accroche==false&& truc==false && equipe=="epee"){
+                player.anims.play('piqueG', true)
+                pique=true
+                player.setSize(32,128)
+                player.setOffset(0,0)
+                attack=true
+                this.attack
+                actd=true
+                player.setVelocityX(0)
+                player.setVelocityY(500)
+                cursors.right.reset();
+                cursors.left.reset();
+                cursors.up.reset();
+                cursors.down.reset();
+                cursors.space.reset()
+                this.input.keyboard.enabled = false; 
+            }
+
+            if (player.body.blocked.down && pique==true){
+                    player.setSize(32,64)
+                    pique=false
+                    attack=false
+                    actg=false
+                    actd=false
+                    this.input.keyboard.enabled = true;
+                }
+                
+
+                //Changement scene
+                if (life==0) {
+
+                    this.scene.start('GameOver');
+                }
+                if (boss_vaincu==3) {
+                    this.scene.start('Fin');
+                }
+                    
+            
+
+        }
+            //Fonctions
+
+        attack(player,enemies){
+        if (attack==true){
+        enemies.disableBody(true, true);
+        }
+        }
+
+        haricot(player,haricot){
+            if(plante==true && player.body.velocity.x==0){
+                haricot.anims.play("plante",true)
+                setTimeout(() => {
+                    haricot.la=true
+                },300);
+                if (sens=='droite'){
+                    player.x-=32
+                }
+                else if (sens=='gauche'){
+                    player.x+=32
+                }
+            }
+        }
+
+        accroche(player,haricot){
+            accroche=true
+            saut=false
+            cursors.right.reset()
+            cursors.left.reset()
+            //player.setOffset(32,0)
+            //player.setSize(2,64)
+            
+        }
+
+        grapple(grappin,prise){
+            if(grappinActive==true){
+                player.x=prise.x
+                grappin.setVelocityX(0)
+                grappin.setVisible(false)
+                grappAccroch=true
+                grappinActive=false
+                setTimeout(() => {
+                    grappAccroch=false
+                },300);      
+            }
+            if (grappinActiveHaut==true){
+                player.setVelocityY(-750)
+                grappin.setVelocityX(0)
+                grappin.setVisible(false)
+                grappAccroch=true
+                grappinActiveHaut=false
+                setTimeout(() => {
+                    grappAccroch=false
+                },300); 
+            }
+
+        }
+        hitEnemy (player, enemies) {
+                if (pique==true){
+                    enemies.disableBody(true,true)
+                    player.setVelocityY(-425)
+                }
+                if (attack==false){
+                    if (vulnerable==true){
+                vie-=1
+                vulnerable=false
+                player.setTint(0xff0000)
+                if (sens=="gauche"){
+                    player.setVelocityX(250)
+                }
+                if (sens=="droite"){
+                    player.setVelocityX(-250)
+                }
+                setTimeout(()=> {
+                    player.setTint(0xffffff)
+                    vulnerable=true
+                },1000)
+                
+                }
+                }
+            }
+            piqueBoss (player, boss) {
+                if (pique==true && bossVulnerable){
+                    bossLife-=1
+                    player.setVelocityY(-425)
+                    boss.setTint(0xff0000)
+                    bossVulnerable=false
+                    setTimeout(()=> {
+                        boss.setTint(0xffffff)
+                        bossVulnerable=true
+                    },1000)
+                    if (bossLife<=0){
+                    boss.disableBody(true,true)
+                    boss_vaincu+=1
+                }       
+                }
+                if (attack==false && pique==false){
+                    if (vulnerable==true){
+                vie-=1
+                vulnerable=false
+                player.setTint(0xff0000)
+                if (sens=="gauche"){
+                    player.setVelocityX(250)
+                }
+                if (sens=="droite"){
+                    player.setVelocityX(-250)
+                }
+                setTimeout(()=> {
+                    player.setTint(0xffffff)
+                    vulnerable=true
+                },1000)
+                }
+                }
+            }
+
+            hitBoss(){
+                if (attack=true){
+                if (bossLife>0){
+                    if (bossVulnerable==true){
+                    bossLife-=1
+                    bossVulnerable=false
+                    boss.setVelocityX(0)
+                    boss.setVelocityY(0)
+                    boss.setTint(0xff0000)
+                    setTimeout(()=>{
+                        boss.setTint(0xffffff)
+                        bossVulnerable=true
+                    },1000)
+                    
+                    }
+                }
+                else{
+                    boss.disableBody(true,true)
+                    boss_vaincu+=1
+                }
+            }}
+
+            AfficheText(player,pnj){
+                textbox.setVisible(true)
+                text.setVisible(true)
+                texteDit=true
+                grappin_possede=true
+                if (cursors.space.isDown){
+                    texteDit=false
+                    pnj.disableBody(true,true)
+                    textbox.setVisible(false)
+                    text.setVisible(false)
+                }
+            }
+
+            check(player,checkpoint){
+                posx=checkpoint.x
+                posy=checkpoint.y
+            }
+            mort(player){
+                if (life>0){
+                player.x=posx
+                player.y=posy
+                vie-=1
+                }
+                if (vie<=0){
+                    vie=4
+                    life-=1   
+                }
+            }
+
+            majLife(){
+                if (vie==4){
+                afficheVie.setFrame(0)
+                }
+                if (vie==3){
+                afficheVie.setFrame(1)
+                }
+                if (vie==2){
+                afficheVie.setFrame(2)
+                }
+                if (vie==1){
+                afficheVie.setFrame(3)
+                }
+                if (vie==0){
+                afficheVie.setFrame(4)
+                }
+                if (life==3){
+                    afficheVie2.setFrame(0)
+                }
+                if (life==2){
+                    afficheVie2.setFrame(1)
+                }
+                if (life==1){
+                    afficheVie2.setFrame(2)
+                }
+                if (life==0){
+                    afficheVie2.setFrame(3)
+                }
+            }
+            activeBoss(boss){
+                if (bossLife>1){
+                if(player.x<boss.x){
+                    boss.setVelocityX(-100)
+                    boss.anims.play('wolfG',true)
+                }
+                if(player.x>boss.x){
+                    boss.setVelocityX(100)
+                    boss.anims.play('wolfD',true)
+                }}
+                else if (bossLife==1){
+                    boss.setVelocityX(200)
+                    boss.anims.play('wolfD',true)
+                    if (boss.x>=1856){
+                        boss.setVelocityX(0)
+                        boss.anims.play('wolfBlow1',true)
+                        vent1.la=true
+                        console.log('vcguhdvdcjhkldfvjkerdsjbuhcdsxjhkvfrsjhfkr')
+                        
+                    }
+                }
+            }
+            wind(player,vent){
+                if (vent.la==true){
+                pousse=true
+                player.setVelocityX(-500)
+                
+                setTimeout(()=>{
+                        pousse=false
+                    },500)}
+            }
+            heal(player,soin){
+                vie=4
+                life=3
+                soin.disableBody(true,true)
+            }
+
+        }
+
+
+
+
+        class GameOver extends Phaser.Scene {
+            constructor() {
+                super("GameOver");
+            }
+
+            preload() {
+                this.load.image('Perdu','assets/GameOver.png')
+            }
+            create(){
+                var perdu=this.physics.add.sprite(400,225,'Perdu')
+                perdu.body.setAllowGravity(false)
+            }
+        }
+
+        class Fin extends Phaser.Scene {
+            constructor() {
+                super("Fin");
+            }
+
+            preload() {
+                this.load.image('End','assets/End.png')
+            }
+            create(){
+                var end=this.physics.add.sprite(400,225,'End')
+                end.body.setAllowGravity(false)
+            }
+        }
+
+var config = {
+
+physics: {
+    default: 'arcade',
+    arcade: {
+        gravity: {y:950},
+        debug: false
+    }
+},
+
+type: Phaser.AUTO,
+width: 800, height: 450,
+scene: [Overworld,Tour,Marais,Witch,GameOver,Fin],
+pixelArt :true
+};
+
+
+new Phaser.Game(config);
+
+var vulnerable=true;
+var porte;
+var attack=false;
+var inZone=false;
+var pnj;
+var player;
+var cursors;
+var gameOver;
+var actg=false;
+var actd=false;
+var actu=false;
+var actb=false;
+var actgm=false;
+var actdm=false;
+var actum=false;
+var actbm=false;
+var afficheVie;
+var afficheVie2;
+var ui;
+var ui2;
+var vieuxx;
+var vieuxy;
+
+var bossVulnerable=true;
+var textbox;
+var text;
+var texteDit=false;
+var coeur;
+var afficheEpee
+var afficheGrappin
+var objet1
+var objet2
+
+var sens= 'droite';
+var saut= false;
+var meuble;
+var plante=false;
+var haricot
+var accroche=false;
+var truc=false;
+var finHaricot;
+var bout;
+var grappin;
+var ctrl
+var equipe="epee"
+var prise
+var grapple
+var grappAccroch=false
+var pique=false
+var deja_att=0
+var boss_vaincu=0
+var boss
+var checkpoint
+var vide
+var plateforme
+var porte
+var porte1
+var porte2
+var magie
+var magieprete=true
+var vent
+var vent1
+var pousse=false
+var soin
+var grappinActive=false
+var grappinActiveHaut=false
+
+
+var posx=40
+var posy=2496
+var haricot_possede=false
+var grappin_possede=false
+var bossLife=3;
+var life=3
+var vie=4;
+
+
+
+</script>
+</body>
+
+</html>
